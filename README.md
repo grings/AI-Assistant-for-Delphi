@@ -200,7 +200,7 @@ CyAIAssistant follows the active Delphi IDE theme automatically. Full support fo
 ## License
 
 CyAIAssistant is released under the [GNU General Public License v2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
-SSH-Pascal library files are released under the [MIT License](https://github.com/pyscripter/Ssh-Pascal?tab=MIT-1-ov-file#readme). 
+SSH-Pascal library files are released under the [MIT License](https://github.com/pyscripter/Ssh-Pascal?tab=MIT-1-ov-file#readme). 
 
 ---
 
