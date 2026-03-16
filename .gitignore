@@ -1,0 +1,7 @@
+/source/__recovery
+/source/__history
+/source/*.identcache
+/source/*.local
+/lib
+/*.dcu
+/*.bak

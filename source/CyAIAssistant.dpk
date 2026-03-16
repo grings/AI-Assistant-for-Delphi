@@ -1,0 +1,55 @@
+﻿package CyAIAssistant;
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  designide;
+
+contains
+  CyAIAssistant.Register in 'CyAIAssistant.Register.pas',
+  CyAIAssistant.Plugin in 'CyAIAssistant.Plugin.pas',
+  CyAIAssistant.Wizard in 'CyAIAssistant.Wizard.pas',
+  CyAIAssistant.Settings in 'CyAIAssistant.Settings.pas',
+  CyAIAssistant.AIClient in 'CyAIAssistant.AIClient.pas',
+  CyAIAssistant.IDETheme in 'CyAIAssistant.IDETheme.pas',
+  CyAIAssistant.DiffViewer in 'CyAIAssistant.DiffViewer.pas',
+  CyAIAssistant.NewUnitDialog in 'CyAIAssistant.NewUnitDialog.pas',
+  CyAIAssistant.PromptDialog in 'CyAIAssistant.PromptDialog.pas',
+  CyAIAssistant.SettingsDialog in 'CyAIAssistant.SettingsDialog.pas',
+  CyAIAssistant.AboutDialog in 'CyAIAssistant.AboutDialog.pas',
+  CyAIAssistant.ChatDialog in 'CyAIAssistant.ChatDialog.pas',
+  CyAIAssistant.SftpSync in 'CyAIAssistant.SftpSync.pas',
+  CyAIAssistant.SftpSyncDialog in 'CyAIAssistant.SftpSyncDialog.pas',
+  SSHPascal.libssh2 in 'SSHPascal.libssh2.pas',
+  SSHPascal.libssh2_sftp in 'SSHPascal.libssh2_sftp.pas',
+  SSHPascal.SftpClient in 'SSHPascal.SftpClient.pas',
+  SSHPascal.SocketUtils in 'SSHPascal.SocketUtils.pas',
+  SSHPascal.Ssh2Client in 'SSHPascal.Ssh2Client.pas';
+
+end.
