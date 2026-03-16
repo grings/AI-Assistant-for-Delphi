@@ -139,7 +139,7 @@ CyAIAssistant follows the active Delphi IDE theme automatically. Full support fo
 
 ## Dependencies
 
-- [SSH-Pascal](https://github.com/pyscripter/Ssh-Pascal) — SSH/SFTP library used by the sync engine (`Ssh2Client.pas`, `SftpClient.pas`)
+- [SSH-Pascal](https://github.com/pyscripter/Ssh-Pascal) — SSH/SFTP library used by the sync engine ('libssh2.pas', 'libssh2_sftp.pas', 'SftpClient.pas', 'SocketUtils.pas', 'Ssh2Client.pas'). All needed files included in the source folder.
 
 ---
 
