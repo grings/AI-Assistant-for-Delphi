@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/License-GPL--2.0-blue)
 ![Platform](https://img.shields.io/badge/Platform-Windows-0078D4?logo=windows)
 
-CyAIAssistant is an Open Tools API plugin for Delphi 11+ that brings AI-assisted coding directly into the IDE. Select code, describe what you need, and get a result — without leaving the editor.
+CyAIAssistant is an Open Tools API plugin for Delphi 10.4+ that brings AI-assisted coding directly into the IDE. Select code, describe what you need, and get a result — without leaving the editor.
 
 ---
 
@@ -130,7 +130,7 @@ CyAIAssistant follows the active Delphi IDE theme automatically. Full support fo
 
 ## Requirements
 
-- Delphi 11 Alexandria or later
+- Delphi 10.4 Sydney or later
 - Windows 10 / 11
 - An API key for at least one supported provider, **or** a locally running [Ollama](https://ollama.ai) instance for fully offline use
 - For SFTP sync: an SFTP server accessible from the development machine (a Linux VM with OpenSSH works well)
