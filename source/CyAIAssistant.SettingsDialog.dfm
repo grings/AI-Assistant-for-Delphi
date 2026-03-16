@@ -1,23 +1,23 @@
-object SettingsDialog: TSettingsDialog
+﻿object SettingsDialog: TSettingsDialog
   Left = 0
   Top = 0
   Caption = 'Cypheros AI Assistant - Settings'
-  ClientHeight = 539
-  ClientWidth = 1050
+  ClientHeight = 359
+  ClientWidth = 700
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -18
+  Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  PixelsPerInch = 144
   TextHeight = 25
+  PixelsPerInch = 96
   object PanelBottom: TPanel
     Left = 0
-    Top = 467
-    Width = 1050
-    Height = 72
+    Top = 311
+    Width = 700
+    Height = 48
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -29,10 +29,10 @@ object SettingsDialog: TSettingsDialog
       1050
       72)
     object BtnOK: TButton
-      Left = 743
-      Top = 14
-      Width = 135
-      Height = 45
+      Left = 495
+      Top = 9
+      Width = 90
+      Height = 30
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -44,10 +44,10 @@ object SettingsDialog: TSettingsDialog
       OnClick = BtnOKClick
     end
     object BtnCancel: TButton
-      Left = 896
-      Top = 14
-      Width = 135
-      Height = 45
+      Left = 597
+      Top = 9
+      Width = 90
+      Height = 30
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -62,13 +62,13 @@ object SettingsDialog: TSettingsDialog
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 1050
-    Height = 467
+    Width = 700
+    Height = 311
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
     Margins.Bottom = 5
-    ActivePage = TabCustomPrompts
+    ActivePage = TabClaude
     Align = alClient
     MultiLine = True
     TabOrder = 1
@@ -79,10 +79,10 @@ object SettingsDialog: TSettingsDialog
       Margins.Bottom = 5
       Caption = '  Claude (Anthropic)  '
       object LblClaudeKey: TLabel
-        Left = 24
-        Top = 30
-        Width = 64
-        Height = 25
+        Left = 16
+        Top = 20
+        Width = 43
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -90,10 +90,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Key:'
       end
       object LblClaudeModel: TLabel
-        Left = 24
-        Top = 86
-        Width = 55
-        Height = 25
+        Left = 16
+        Top = 57
+        Width = 37
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -101,10 +101,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Model:'
       end
       object LblClaudeEndpoint: TLabel
-        Left = 24
-        Top = 140
-        Width = 108
-        Height = 25
+        Left = 16
+        Top = 93
+        Width = 72
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -112,10 +112,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Endpoint:'
       end
       object LblClaudeInfo: TLabel
-        Left = 24
-        Top = 198
-        Width = 676
-        Height = 50
+        Left = 16
+        Top = 132
+        Width = 451
+        Height = 33
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -126,10 +126,10 @@ object SettingsDialog: TSettingsDialog
           'Delphi'
       end
       object Bevel3: TBevel
-        Left = 15
-        Top = 180
-        Width = 975
-        Height = 3
+        Left = 10
+        Top = 120
+        Width = 650
+        Height = 2
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -137,10 +137,10 @@ object SettingsDialog: TSettingsDialog
         Shape = bsTopLine
       end
       object EditClaudeKey: TEdit
-        Left = 300
-        Top = 26
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 17
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -149,27 +149,29 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 0
       end
       object EditClaudeModel: TComboBox
-        Left = 300
-        Top = 81
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 54
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
         Margins.Bottom = 5
         TabOrder = 1
         Items.Strings = (
+          'claude-opus-4-6'
           'claude-opus-4-5'
+          'claude-sonnet-4-6'
           'claude-sonnet-4-5'
           'claude-haiku-4-5'
           'claude-3-5-sonnet-20241022'
           'claude-3-opus-20240229')
       end
       object EditClaudeEndpoint: TEdit
-        Left = 300
-        Top = 135
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 90
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -184,10 +186,10 @@ object SettingsDialog: TSettingsDialog
       Margins.Bottom = 5
       Caption = '  OpenAI / GPT  '
       object LblOpenAIKey: TLabel
-        Left = 24
-        Top = 30
-        Width = 64
-        Height = 25
+        Left = 16
+        Top = 20
+        Width = 43
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -195,10 +197,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Key:'
       end
       object LblOpenAIModel: TLabel
-        Left = 24
-        Top = 86
-        Width = 55
-        Height = 25
+        Left = 16
+        Top = 57
+        Width = 37
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -206,10 +208,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Model:'
       end
       object LblOpenAIEndpoint: TLabel
-        Left = 24
-        Top = 140
-        Width = 108
-        Height = 25
+        Left = 16
+        Top = 93
+        Width = 72
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -217,10 +219,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Endpoint:'
       end
       object LblOpenAIInfo: TLabel
-        Left = 24
-        Top = 198
-        Width = 386
-        Height = 25
+        Left = 16
+        Top = 132
+        Width = 257
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -228,10 +230,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Get your API key at: https://platform.openai.com'
       end
       object Bevel4: TBevel
-        Left = 15
-        Top = 180
-        Width = 975
-        Height = 3
+        Left = 10
+        Top = 120
+        Width = 650
+        Height = 2
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -239,10 +241,10 @@ object SettingsDialog: TSettingsDialog
         Shape = bsTopLine
       end
       object EditOpenAIKey: TEdit
-        Left = 300
-        Top = 26
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 17
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -251,10 +253,10 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 0
       end
       object EditOpenAIModel: TComboBox
-        Left = 300
-        Top = 81
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 54
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -268,10 +270,10 @@ object SettingsDialog: TSettingsDialog
           'gpt-3.5-turbo')
       end
       object EditOpenAIEndpoint: TEdit
-        Left = 300
-        Top = 135
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 90
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -286,10 +288,10 @@ object SettingsDialog: TSettingsDialog
       Margins.Bottom = 5
       Caption = '  Ollama (Local)  '
       object LblOllamaEndpoint: TLabel
-        Left = 24
-        Top = 30
-        Width = 112
-        Height = 25
+        Left = 16
+        Top = 20
+        Width = 75
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -297,10 +299,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Endpoint URL:'
       end
       object LblOllamaModel: TLabel
-        Left = 24
-        Top = 86
-        Width = 55
-        Height = 25
+        Left = 16
+        Top = 57
+        Width = 37
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -308,10 +310,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Model:'
       end
       object LblOllamaInfo: TLabel
-        Left = 24
-        Top = 203
-        Width = 610
-        Height = 75
+        Left = 16
+        Top = 135
+        Width = 407
+        Height = 50
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -322,10 +324,10 @@ object SettingsDialog: TSettingsDialog
           'k-coder, qwen2.5-coder'
       end
       object EditOllamaEndpoint: TEdit
-        Left = 300
-        Top = 26
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 17
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -333,10 +335,10 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 0
       end
       object ComboOllamaModel: TComboBox
-        Left = 300
-        Top = 81
-        Width = 420
-        Height = 33
+        Left = 200
+        Top = 54
+        Width = 280
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -344,10 +346,10 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 1
       end
       object BtnLoadModels: TButton
-        Left = 735
-        Top = 80
-        Width = 195
-        Height = 39
+        Left = 490
+        Top = 53
+        Width = 130
+        Height = 26
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -357,10 +359,10 @@ object SettingsDialog: TSettingsDialog
         OnClick = BtnLoadModelsClick
       end
       object BtnTestOllama: TButton
-        Left = 300
-        Top = 135
-        Width = 240
-        Height = 39
+        Left = 200
+        Top = 90
+        Width = 160
+        Height = 26
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -377,10 +379,10 @@ object SettingsDialog: TSettingsDialog
       Margins.Bottom = 5
       Caption = '  Groq  '
       object LblGroqKey: TLabel
-        Left = 24
-        Top = 30
-        Width = 64
-        Height = 25
+        Left = 16
+        Top = 20
+        Width = 43
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -388,10 +390,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Key:'
       end
       object LblGroqModel: TLabel
-        Left = 24
-        Top = 86
-        Width = 55
-        Height = 25
+        Left = 16
+        Top = 57
+        Width = 37
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -399,10 +401,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Model:'
       end
       object LblGroqEndpoint: TLabel
-        Left = 24
-        Top = 140
-        Width = 108
-        Height = 25
+        Left = 16
+        Top = 93
+        Width = 72
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -410,10 +412,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Endpoint:'
       end
       object LblGroqInfo: TLabel
-        Left = 24
-        Top = 198
-        Width = 363
-        Height = 25
+        Left = 16
+        Top = 132
+        Width = 242
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -421,10 +423,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Get your API key at: https://console.groq.com'
       end
       object Bevel5: TBevel
-        Left = 15
-        Top = 180
-        Width = 975
-        Height = 3
+        Left = 10
+        Top = 120
+        Width = 650
+        Height = 2
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -432,10 +434,10 @@ object SettingsDialog: TSettingsDialog
         Shape = bsTopLine
       end
       object EditGroqKey: TEdit
-        Left = 300
-        Top = 26
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 17
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -444,10 +446,10 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 0
       end
       object EditGroqModel: TComboBox
-        Left = 300
-        Top = 81
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 54
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -461,10 +463,10 @@ object SettingsDialog: TSettingsDialog
           'gemma2-9b-it')
       end
       object EditGroqEndpoint: TEdit
-        Left = 300
-        Top = 135
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 90
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -479,10 +481,10 @@ object SettingsDialog: TSettingsDialog
       Margins.Bottom = 5
       Caption = '  Mistral  '
       object LblMistralKey: TLabel
-        Left = 24
-        Top = 30
-        Width = 64
-        Height = 25
+        Left = 16
+        Top = 20
+        Width = 43
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -490,10 +492,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Key:'
       end
       object LblMistralModel: TLabel
-        Left = 24
-        Top = 86
-        Width = 55
-        Height = 25
+        Left = 16
+        Top = 57
+        Width = 37
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -501,10 +503,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Model:'
       end
       object LblMistralEndpoint: TLabel
-        Left = 24
-        Top = 140
-        Width = 108
-        Height = 25
+        Left = 16
+        Top = 93
+        Width = 72
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -512,10 +514,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'API Endpoint:'
       end
       object LblMistralInfo: TLabel
-        Left = 24
-        Top = 198
-        Width = 355
-        Height = 25
+        Left = 16
+        Top = 132
+        Width = 237
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -523,10 +525,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Get your API key at: https://console.mistral.ai'
       end
       object Bevel6: TBevel
-        Left = 15
-        Top = 180
-        Width = 975
-        Height = 3
+        Left = 10
+        Top = 120
+        Width = 650
+        Height = 2
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -534,10 +536,10 @@ object SettingsDialog: TSettingsDialog
         Shape = bsTopLine
       end
       object EditMistralKey: TEdit
-        Left = 300
-        Top = 26
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 17
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -546,10 +548,10 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 0
       end
       object EditMistralModel: TComboBox
-        Left = 300
-        Top = 81
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 54
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -563,10 +565,10 @@ object SettingsDialog: TSettingsDialog
           'open-mistral-7b')
       end
       object EditMistralEndpoint: TEdit
-        Left = 300
-        Top = 135
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 90
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -581,10 +583,10 @@ object SettingsDialog: TSettingsDialog
       Margins.Bottom = 5
       Caption = '  General  '
       object LblDefaultProvider: TLabel
-        Left = 24
-        Top = 35
-        Width = 132
-        Height = 25
+        Left = 16
+        Top = 23
+        Width = 88
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -592,10 +594,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Default Provider:'
       end
       object LblMaxTokens: TLabel
-        Left = 24
-        Top = 89
-        Width = 96
-        Height = 25
+        Left = 16
+        Top = 59
+        Width = 64
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -603,10 +605,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Max Tokens:'
       end
       object LblTemperature: TLabel
-        Left = 24
-        Top = 143
-        Width = 102
-        Height = 25
+        Left = 16
+        Top = 95
+        Width = 68
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -614,10 +616,10 @@ object SettingsDialog: TSettingsDialog
         Caption = 'Temperature:'
       end
       object LblGeneralInfo: TLabel
-        Left = 24
-        Top = 203
-        Width = 536
-        Height = 50
+        Left = 16
+        Top = 135
+        Width = 357
+        Height = 33
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -627,10 +629,10 @@ object SettingsDialog: TSettingsDialog
           'ive)'#13#10'Access via: Tools > Cypheros AI Assistant > Code Assistant'
       end
       object ComboDefaultProvider: TComboBox
-        Left = 300
-        Top = 30
-        Width = 300
-        Height = 33
+        Left = 200
+        Top = 20
+        Width = 200
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -645,10 +647,10 @@ object SettingsDialog: TSettingsDialog
           'Mistral')
       end
       object EditMaxTokens: TEdit
-        Left = 300
-        Top = 84
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 56
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -656,10 +658,10 @@ object SettingsDialog: TSettingsDialog
         TabOrder = 1
       end
       object EditTemperature: TEdit
-        Left = 300
-        Top = 138
-        Width = 660
-        Height = 33
+        Left = 200
+        Top = 92
+        Width = 440
+        Height = 22
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -676,8 +678,8 @@ object SettingsDialog: TSettingsDialog
       object PanelPromptsLeft: TPanel
         Left = 0
         Top = 0
-        Width = 330
-        Height = 427
+        Width = 220
+        Height = 285
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -688,8 +690,8 @@ object SettingsDialog: TSettingsDialog
         object LblPromptTemplates: TLabel
           Left = 0
           Top = 0
-          Width = 330
-          Height = 25
+          Width = 220
+          Height = 17
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -698,18 +700,18 @@ object SettingsDialog: TSettingsDialog
           Caption = '  Prompt Templates'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -18
+          Font.Height = -12
           Font.Name = 'Segoe UI'
           Font.Style = [fsBold]
           ParentFont = False
           Layout = tlCenter
-          ExplicitWidth = 164
+          ExplicitWidth = 109
         end
         object ListCustomPrompts: TListBox
           Left = 0
-          Top = 25
-          Width = 330
-          Height = 348
+          Top = 17
+          Width = 220
+          Height = 232
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -721,9 +723,9 @@ object SettingsDialog: TSettingsDialog
         end
         object PanelListBtns: TPanel
           Left = 0
-          Top = 373
-          Width = 330
-          Height = 54
+          Top = 249
+          Width = 220
+          Height = 36
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -732,10 +734,10 @@ object SettingsDialog: TSettingsDialog
           BevelOuter = bvNone
           TabOrder = 1
           object BtnMoveUp: TButton
-            Left = 3
-            Top = 6
-            Width = 54
-            Height = 42
+            Left = 2
+            Top = 4
+            Width = 36
+            Height = 28
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -745,10 +747,10 @@ object SettingsDialog: TSettingsDialog
             OnClick = BtnMoveUpClick
           end
           object BtnMoveDown: TButton
-            Left = 60
-            Top = 6
-            Width = 54
-            Height = 42
+            Left = 40
+            Top = 4
+            Width = 36
+            Height = 28
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -758,10 +760,10 @@ object SettingsDialog: TSettingsDialog
             OnClick = BtnMoveDownClick
           end
           object BtnDeletePrompt: TButton
-            Left = 120
-            Top = 6
-            Width = 54
-            Height = 42
+            Left = 80
+            Top = 4
+            Width = 36
+            Height = 28
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -773,10 +775,10 @@ object SettingsDialog: TSettingsDialog
         end
       end
       object PanelPromptsRight: TPanel
-        Left = 330
+        Left = 220
         Top = 0
-        Width = 712
-        Height = 427
+        Width = 475
+        Height = 285
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -787,8 +789,8 @@ object SettingsDialog: TSettingsDialog
         object PanelPromptTop: TPanel
           Left = 0
           Top = 0
-          Width = 712
-          Height = 93
+          Width = 475
+          Height = 62
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -800,10 +802,10 @@ object SettingsDialog: TSettingsDialog
             712
             93)
           object LblPromptName: TLabel
-            Left = 12
-            Top = 18
-            Width = 116
-            Height = 25
+            Left = 8
+            Top = 12
+            Width = 77
+            Height = 17
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -811,10 +813,10 @@ object SettingsDialog: TSettingsDialog
             Caption = 'Prompt Name:'
           end
           object LblTemplate: TLabel
-            Left = 12
-            Top = 60
-            Width = 562
-            Height = 25
+            Left = 8
+            Top = 40
+            Width = 375
+            Height = 17
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -824,10 +826,10 @@ object SettingsDialog: TSettingsDialog
               'box):'
           end
           object EditPromptName: TEdit
-            Left = 180
-            Top = 14
-            Width = 517
-            Height = 33
+            Left = 120
+            Top = 9
+            Width = 345
+            Height = 22
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -838,9 +840,9 @@ object SettingsDialog: TSettingsDialog
         end
         object PanelPromptBtns: TPanel
           Left = 0
-          Top = 367
-          Width = 712
-          Height = 60
+          Top = 245
+          Width = 475
+          Height = 40
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -849,10 +851,10 @@ object SettingsDialog: TSettingsDialog
           BevelOuter = bvNone
           TabOrder = 1
           object BtnAddPrompt: TButton
-            Left = 6
-            Top = 8
-            Width = 150
-            Height = 45
+            Left = 4
+            Top = 5
+            Width = 100
+            Height = 30
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -862,10 +864,10 @@ object SettingsDialog: TSettingsDialog
             OnClick = BtnAddPromptClick
           end
           object BtnUpdatePrompt: TButton
-            Left = 168
-            Top = 8
-            Width = 195
-            Height = 45
+            Left = 112
+            Top = 5
+            Width = 130
+            Height = 30
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -875,10 +877,10 @@ object SettingsDialog: TSettingsDialog
             OnClick = BtnUpdatePromptClick
           end
           object BtnClearFields: TButton
-            Left = 375
-            Top = 8
-            Width = 150
-            Height = 45
+            Left = 250
+            Top = 5
+            Width = 100
+            Height = 30
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -890,9 +892,9 @@ object SettingsDialog: TSettingsDialog
         end
         object MemoPromptTemplate: TMemo
           Left = 0
-          Top = 93
-          Width = 712
-          Height = 274
+          Top = 62
+          Width = 475
+          Height = 183
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -900,7 +902,7 @@ object SettingsDialog: TSettingsDialog
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -23
+          Font.Height = -15
           Font.Name = 'Consolas'
           Font.Style = []
           ParentFont = False

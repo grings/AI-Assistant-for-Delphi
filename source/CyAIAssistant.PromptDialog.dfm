@@ -1,34 +1,34 @@
-object PromptDialog: TPromptDialog
+﻿object PromptDialog: TPromptDialog
   Left = 0
   Top = 0
   Caption = 'Cypheros AI Assistant - Code Assistant'
-  ClientHeight = 909
-  ClientWidth = 1350
+  ClientHeight = 606
+  ClientWidth = 900
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -18
+  Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  PixelsPerInch = 144
   TextHeight = 25
+  PixelsPerInch = 96
   object Splitter: TSplitter
-    Left = 420
-    Top = 141
-    Width = 6
-    Height = 696
+    Left = 280
+    Top = 94
+    Width = 4
+    Height = 464
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
     Margins.Bottom = 5
-    ExplicitHeight = 759
+    ExplicitHeight = 506
   end
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 1350
-    Height = 84
+    Width = 900
+    Height = 56
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -41,8 +41,8 @@ object PromptDialog: TPromptDialog
     object LabelTitle: TLabel
       Left = 0
       Top = 0
-      Width = 1350
-      Height = 84
+      Width = 900
+      Height = 56
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -51,21 +51,21 @@ object PromptDialog: TPromptDialog
       Caption = '  Cypheros AI Assistant - Select a prompt and submit your code'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindow
-      Font.Height = -27
+      Font.Height = -18
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
       StyleElements = [seFont, seBorder]
-      ExplicitWidth = 807
-      ExplicitHeight = 37
+      ExplicitWidth = 538
+      ExplicitHeight = 25
     end
   end
   object PanelProvider: TPanel
     Left = 0
-    Top = 84
-    Width = 1350
-    Height = 57
+    Top = 56
+    Width = 900
+    Height = 38
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -74,10 +74,10 @@ object PromptDialog: TPromptDialog
     BevelOuter = bvNone
     TabOrder = 1
     object LabelProvider: TLabel
-      Left = 15
-      Top = 17
-      Width = 70
-      Height = 25
+      Left = 10
+      Top = 11
+      Width = 47
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -85,10 +85,10 @@ object PromptDialog: TPromptDialog
       Caption = 'Provider:'
     end
     object LabelModel: TLabel
-      Left = 323
-      Top = 17
-      Width = 55
-      Height = 25
+      Left = 215
+      Top = 11
+      Width = 37
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -96,10 +96,10 @@ object PromptDialog: TPromptDialog
       Caption = 'Model:'
     end
     object ComboProvider: TComboBox
-      Left = 105
-      Top = 12
-      Width = 195
-      Height = 33
+      Left = 70
+      Top = 8
+      Width = 130
+      Height = 22
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -115,10 +115,10 @@ object PromptDialog: TPromptDialog
         'Mistral')
     end
     object EditModel: TEdit
-      Left = 390
-      Top = 12
-      Width = 300
-      Height = 33
+      Left = 260
+      Top = 8
+      Width = 200
+      Height = 22
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -128,9 +128,9 @@ object PromptDialog: TPromptDialog
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 837
-    Width = 1350
-    Height = 72
+    Top = 558
+    Width = 900
+    Height = 48
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -142,10 +142,10 @@ object PromptDialog: TPromptDialog
       1350
       72)
     object LabelStatus: TLabel
-      Left = 15
-      Top = 24
-      Width = 52
-      Height = 25
+      Left = 10
+      Top = 16
+      Width = 35
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -153,10 +153,10 @@ object PromptDialog: TPromptDialog
       Caption = 'Ready.'
     end
     object CheckStripFences: TCheckBox
-      Left = 474
-      Top = 23
-      Width = 345
-      Height = 25
+      Left = 316
+      Top = 15
+      Width = 230
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -167,10 +167,10 @@ object PromptDialog: TPromptDialog
       TabOrder = 0
     end
     object ProgressBar: TProgressBar
-      Left = 15
-      Top = 21
-      Width = 450
-      Height = 30
+      Left = 10
+      Top = 14
+      Width = 300
+      Height = 20
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -180,10 +180,10 @@ object PromptDialog: TPromptDialog
       Visible = False
     end
     object BtnSubmit: TButton
-      Left = 855
-      Top = 14
-      Width = 195
-      Height = 45
+      Left = 570
+      Top = 9
+      Width = 130
+      Height = 30
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -193,7 +193,7 @@ object PromptDialog: TPromptDialog
       Default = True
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
@@ -201,10 +201,10 @@ object PromptDialog: TPromptDialog
       OnClick = BtnSubmitClick
     end
     object BtnStop: TButton
-      Left = 1065
-      Top = 14
-      Width = 120
-      Height = 45
+      Left = 710
+      Top = 9
+      Width = 80
+      Height = 30
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -216,10 +216,10 @@ object PromptDialog: TPromptDialog
       OnClick = BtnStopClick
     end
     object BtnCancel: TButton
-      Left = 1200
-      Top = 14
-      Width = 135
-      Height = 45
+      Left = 800
+      Top = 9
+      Width = 90
+      Height = 30
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -234,9 +234,9 @@ object PromptDialog: TPromptDialog
   end
   object PanelLeft: TPanel
     Left = 0
-    Top = 141
-    Width = 420
-    Height = 696
+    Top = 94
+    Width = 280
+    Height = 464
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -247,8 +247,8 @@ object PromptDialog: TPromptDialog
     object LabelPrompts: TLabel
       Left = 0
       Top = 0
-      Width = 420
-      Height = 25
+      Width = 280
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -257,18 +257,18 @@ object PromptDialog: TPromptDialog
       Caption = '  Prompt Template'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 156
+      ExplicitWidth = 104
     end
     object LabelCustom: TLabel
       Left = 0
-      Top = 25
-      Width = 420
-      Height = 25
+      Top = 17
+      Width = 280
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -277,18 +277,18 @@ object PromptDialog: TPromptDialog
       Caption = '  Custom Prefix (prepended to prompt)'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 331
+      ExplicitWidth = 221
     end
     object ListPrompts: TListBox
       Left = 0
-      Top = 50
-      Width = 420
-      Height = 300
+      Top = 33
+      Width = 280
+      Height = 200
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -300,9 +300,9 @@ object PromptDialog: TPromptDialog
     end
     object MemoCustomPrefix: TMemo
       Left = 0
-      Top = 350
-      Width = 420
-      Height = 346
+      Top = 233
+      Width = 280
+      Height = 231
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -310,7 +310,7 @@ object PromptDialog: TPromptDialog
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -15
       Font.Name = 'Consolas'
       Font.Style = []
       ParentFont = False
@@ -320,10 +320,10 @@ object PromptDialog: TPromptDialog
     end
   end
   object PanelRight: TPanel
-    Left = 426
-    Top = 141
-    Width = 924
-    Height = 696
+    Left = 284
+    Top = 94
+    Width = 616
+    Height = 464
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -334,8 +334,8 @@ object PromptDialog: TPromptDialog
     object LabelCode: TLabel
       Left = 0
       Top = 0
-      Width = 924
-      Height = 25
+      Width = 616
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -344,18 +344,18 @@ object PromptDialog: TPromptDialog
       Caption = '  Selected Code  (read-only preview)'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 308
+      ExplicitWidth = 205
     end
     object LabelFinal: TLabel
       Left = 0
-      Top = 25
-      Width = 924
-      Height = 25
+      Top = 17
+      Width = 616
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -364,18 +364,18 @@ object PromptDialog: TPromptDialog
       Caption = '  Final Prompt Preview (sent to AI)'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 292
+      ExplicitWidth = 195
     end
     object MemoCode: TMemo
       Left = 0
-      Top = 50
-      Width = 924
-      Height = 300
+      Top = 33
+      Width = 616
+      Height = 200
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -383,7 +383,7 @@ object PromptDialog: TPromptDialog
       Align = alTop
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -15
       Font.Name = 'Consolas'
       Font.Style = []
       ParentFont = False
@@ -394,9 +394,9 @@ object PromptDialog: TPromptDialog
     end
     object MemoFinalPrompt: TMemo
       Left = 0
-      Top = 350
-      Width = 924
-      Height = 346
+      Top = 233
+      Width = 616
+      Height = 231
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -404,7 +404,7 @@ object PromptDialog: TPromptDialog
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -15
       Font.Name = 'Consolas'
       Font.Style = []
       ParentFont = False

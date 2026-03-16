@@ -1,23 +1,23 @@
-object DiffViewerForm: TDiffViewerForm
+﻿object DiffViewerForm: TDiffViewerForm
   Left = 0
   Top = 0
   Caption = 'Cypheros AI Assistant - Review Changes'
-  ClientHeight = 856
-  ClientWidth = 1437
+  ClientHeight = 571
+  ClientWidth = 958
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -18
+  Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  PixelsPerInch = 144
   TextHeight = 25
+  PixelsPerInch = 96
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 1437
-    Height = 75
+    Width = 958
+    Height = 50
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -31,8 +31,8 @@ object DiffViewerForm: TDiffViewerForm
     object LabelTitle: TLabel
       Left = 0
       Top = 0
-      Width = 1437
-      Height = 75
+      Width = 958
+      Height = 50
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -41,20 +41,20 @@ object DiffViewerForm: TDiffViewerForm
       Caption = '  Review AI Changes - Accept or discard the AI-generated code'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindow
-      Font.Height = -27
+      Font.Height = -18
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 800
-      ExplicitHeight = 37
+      ExplicitWidth = 533
+      ExplicitHeight = 25
     end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 778
-    Width = 1437
-    Height = 78
+    Top = 519
+    Width = 958
+    Height = 52
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -66,10 +66,10 @@ object DiffViewerForm: TDiffViewerForm
       1437
       78)
     object LabelStats: TLabel
-      Left = 15
-      Top = 27
-      Width = 134
-      Height = 25
+      Left = 10
+      Top = 18
+      Width = 89
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -77,10 +77,10 @@ object DiffViewerForm: TDiffViewerForm
       Caption = 'Computing diff...'
     end
     object BtnApply: TButton
-      Left = 815
-      Top = 15
-      Width = 210
-      Height = 48
+      Left = 543
+      Top = 10
+      Width = 140
+      Height = 32
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -90,7 +90,7 @@ object DiffViewerForm: TDiffViewerForm
       Default = True
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
@@ -98,10 +98,10 @@ object DiffViewerForm: TDiffViewerForm
       OnClick = BtnApplyClick
     end
     object BtnCopyNew: TButton
-      Left = 1047
-      Top = 15
-      Width = 210
-      Height = 48
+      Left = 698
+      Top = 10
+      Width = 140
+      Height = 32
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -112,10 +112,10 @@ object DiffViewerForm: TDiffViewerForm
       OnClick = BtnCopyClick
     end
     object BtnClose: TButton
-      Left = 1265
-      Top = 15
-      Width = 150
-      Height = 48
+      Left = 843
+      Top = 10
+      Width = 100
+      Height = 32
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -129,9 +129,9 @@ object DiffViewerForm: TDiffViewerForm
   end
   object PageControl: TPageControl
     Left = 0
-    Top = 75
-    Width = 1437
-    Height = 703
+    Top = 50
+    Width = 958
+    Height = 469
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -146,10 +146,10 @@ object DiffViewerForm: TDiffViewerForm
       Margins.Bottom = 5
       Caption = '  Side by Side Diff  '
       object SplitterSide: TSplitter
-        Left = 700
+        Left = 467
         Top = 0
-        Width = 6
-        Height = 663
+        Width = 4
+        Height = 442
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -159,8 +159,8 @@ object DiffViewerForm: TDiffViewerForm
       object PanelOriginal: TPanel
         Left = 0
         Top = 0
-        Width = 700
-        Height = 663
+        Width = 467
+        Height = 442
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -171,8 +171,8 @@ object DiffViewerForm: TDiffViewerForm
         object LabelOrig: TLabel
           Left = 0
           Top = 0
-          Width = 700
-          Height = 25
+          Width = 467
+          Height = 17
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -181,18 +181,18 @@ object DiffViewerForm: TDiffViewerForm
           Caption = '  Original Code'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -18
+          Font.Height = -12
           Font.Name = 'Segoe UI'
           Font.Style = [fsBold]
           ParentFont = False
           Layout = tlCenter
-          ExplicitWidth = 126
+          ExplicitWidth = 84
         end
         object MemoOriginal: TMemo
           Left = 0
-          Top = 25
-          Width = 700
-          Height = 638
+          Top = 17
+          Width = 467
+          Height = 425
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -200,7 +200,7 @@ object DiffViewerForm: TDiffViewerForm
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -23
+          Font.Height = -15
           Font.Name = 'Consolas'
           Font.Style = []
           ParentFont = False
@@ -211,10 +211,10 @@ object DiffViewerForm: TDiffViewerForm
         end
       end
       object PanelNew: TPanel
-        Left = 706
+        Left = 471
         Top = 0
-        Width = 723
-        Height = 663
+        Width = 482
+        Height = 442
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -225,8 +225,8 @@ object DiffViewerForm: TDiffViewerForm
         object LabelNew: TLabel
           Left = 0
           Top = 0
-          Width = 723
-          Height = 25
+          Width = 482
+          Height = 17
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -235,18 +235,18 @@ object DiffViewerForm: TDiffViewerForm
           Caption = '  AI Generated Code'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -18
+          Font.Height = -12
           Font.Name = 'Segoe UI'
           Font.Style = [fsBold]
           ParentFont = False
           Layout = tlCenter
-          ExplicitWidth = 171
+          ExplicitWidth = 114
         end
         object MemoNew: TMemo
           Left = 0
-          Top = 25
-          Width = 723
-          Height = 638
+          Top = 17
+          Width = 482
+          Height = 425
           Margins.Left = 5
           Margins.Top = 5
           Margins.Right = 5
@@ -254,7 +254,7 @@ object DiffViewerForm: TDiffViewerForm
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
-          Font.Height = -23
+          Font.Height = -15
           Font.Name = 'Consolas'
           Font.Style = []
           ParentFont = False
@@ -274,8 +274,8 @@ object DiffViewerForm: TDiffViewerForm
       object MemoDiff: TRichEdit
         Left = 0
         Top = 0
-        Width = 1429
-        Height = 663
+        Width = 953
+        Height = 442
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -283,7 +283,7 @@ object DiffViewerForm: TDiffViewerForm
         Align = alClient
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
-        Font.Height = -15
+        Font.Height = -10
         Font.Name = 'Consolas'
         Font.Style = []
         ParentFont = False
@@ -302,8 +302,8 @@ object DiffViewerForm: TDiffViewerForm
       object MemoAIEdit: TMemo
         Left = 0
         Top = 0
-        Width = 1429
-        Height = 663
+        Width = 953
+        Height = 442
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -311,7 +311,7 @@ object DiffViewerForm: TDiffViewerForm
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
-        Font.Height = -23
+        Font.Height = -15
         Font.Name = 'Consolas'
         Font.Style = []
         ParentFont = False

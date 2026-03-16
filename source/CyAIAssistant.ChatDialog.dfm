@@ -1,23 +1,23 @@
-object ChatDialog: TChatDialog
+﻿object ChatDialog: TChatDialog
   Left = 0
   Top = 0
   Caption = 'Cypheros AI Assistant - AI Chat'
-  ClientHeight = 770
-  ClientWidth = 1377
+  ClientHeight = 513
+  ClientWidth = 918
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -18
+  Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  PixelsPerInch = 144
   TextHeight = 25
+  PixelsPerInch = 96
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 1377
-    Height = 66
+    Width = 918
+    Height = 44
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -32,10 +32,10 @@ object ChatDialog: TChatDialog
       1377
       66)
     object LabelTitle: TLabel
-      Left = 18
-      Top = 9
-      Width = 104
-      Height = 41
+      Left = 12
+      Top = 6
+      Width = 69
+      Height = 27
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -43,17 +43,17 @@ object ChatDialog: TChatDialog
       Caption = 'AI Chat'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindow
-      Font.Height = -30
+      Font.Height = -20
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
     end
     object LabelProvider: TLabel
-      Left = 240
-      Top = 21
-      Width = 70
-      Height = 25
+      Left = 160
+      Top = 14
+      Width = 47
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -61,16 +61,16 @@ object ChatDialog: TChatDialog
       Caption = 'Provider:'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
     end
     object LabelModel: TLabel
-      Left = 504
-      Top = 21
-      Width = 55
-      Height = 25
+      Left = 336
+      Top = 14
+      Width = 37
+      Height = 17
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -78,16 +78,16 @@ object ChatDialog: TChatDialog
       Caption = 'Model:'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
-      Font.Height = -18
+      Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
     end
     object ComboProvider: TComboBox
-      Left = 338
-      Top = 15
-      Width = 150
-      Height = 33
+      Left = 225
+      Top = 10
+      Width = 100
+      Height = 22
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -103,10 +103,10 @@ object ChatDialog: TChatDialog
         'Mistral')
     end
     object EditModel: TEdit
-      Left = 578
-      Top = 15
-      Width = 300
-      Height = 33
+      Left = 385
+      Top = 10
+      Width = 200
+      Height = 22
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -115,10 +115,10 @@ object ChatDialog: TChatDialog
       TabOrder = 1
     end
     object BtnNewChat: TButton
-      Left = 1221
-      Top = 14
-      Width = 135
-      Height = 39
+      Left = 814
+      Top = 9
+      Width = 90
+      Height = 26
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -131,9 +131,9 @@ object ChatDialog: TChatDialog
   end
   object PanelMain: TPanel
     Left = 0
-    Top = 66
-    Width = 1377
-    Height = 704
+    Top = 44
+    Width = 918
+    Height = 469
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -142,21 +142,21 @@ object ChatDialog: TChatDialog
     BevelOuter = bvNone
     TabOrder = 1
     object SplitterMain: TSplitter
-      Left = 690
+      Left = 460
       Top = 0
-      Width = 8
-      Height = 704
+      Width = 5
+      Height = 469
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
       Margins.Bottom = 5
-      ExplicitHeight = 906
+      ExplicitHeight = 604
     end
     object PanelChat: TPanel
       Left = 0
       Top = 0
-      Width = 690
-      Height = 704
+      Width = 460
+      Height = 469
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -167,8 +167,8 @@ object ChatDialog: TChatDialog
       object PageControl: TPageControl
         Left = 0
         Top = 0
-        Width = 690
-        Height = 704
+        Width = 460
+        Height = 469
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -185,8 +185,8 @@ object ChatDialog: TChatDialog
           object LabelInput: TLabel
             Left = 0
             Top = 0
-            Width = 682
-            Height = 25
+            Width = 455
+            Height = 17
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -195,18 +195,18 @@ object ChatDialog: TChatDialog
             Caption = '  Your message:'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
-            Font.Height = -18
+            Font.Height = -12
             Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             ParentFont = False
             Layout = tlCenter
-            ExplicitWidth = 131
+            ExplicitWidth = 87
           end
           object MemoInput: TMemo
             Left = 0
-            Top = 25
-            Width = 682
-            Height = 567
+            Top = 17
+            Width = 455
+            Height = 378
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -214,7 +214,7 @@ object ChatDialog: TChatDialog
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
-            Font.Height = -26
+            Font.Height = -17
             Font.Name = 'Segoe UI'
             Font.Style = []
             ParentFont = False
@@ -223,9 +223,9 @@ object ChatDialog: TChatDialog
           end
           object PanelChatBtns: TPanel
             Left = 0
-            Top = 592
-            Width = 682
-            Height = 72
+            Top = 395
+            Width = 455
+            Height = 48
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -234,20 +234,29 @@ object ChatDialog: TChatDialog
             BevelOuter = bvNone
             TabOrder = 1
             object LabelStatus: TLabel
-              Left = 630
-              Top = 26
-              Width = 5
-              Height = 25
+              Left = 340
+              Top = 31
+              Width = 100
+              Height = 17
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
               Margins.Bottom = 5
+              Alignment = taCenter
+              AutoSize = False
+              Caption = ' '
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
             end
             object BtnSend: TButton
-              Left = 12
-              Top = 14
-              Width = 225
-              Height = 45
+              Left = 8
+              Top = 9
+              Width = 150
+              Height = 30
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -257,10 +266,10 @@ object ChatDialog: TChatDialog
               OnClick = BtnSendClick
             end
             object BtnStop: TButton
-              Left = 252
-              Top = 14
-              Width = 120
-              Height = 45
+              Left = 168
+              Top = 9
+              Width = 80
+              Height = 30
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -271,10 +280,10 @@ object ChatDialog: TChatDialog
               OnClick = BtnStopClick
             end
             object BtnClearInput: TButton
-              Left = 387
-              Top = 14
-              Width = 105
-              Height = 45
+              Left = 258
+              Top = 9
+              Width = 70
+              Height = 30
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -284,10 +293,10 @@ object ChatDialog: TChatDialog
               OnClick = BtnClearInputClick
             end
             object ProgressBar: TProgressBar
-              Left = 510
-              Top = 24
-              Width = 150
-              Height = 24
+              Left = 340
+              Top = 16
+              Width = 100
+              Height = 16
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -306,21 +315,21 @@ object ChatDialog: TChatDialog
           Caption = '  Files Found  '
           TabVisible = False
           object SplitterFiles: TSplitter
-            Left = 300
+            Left = 200
             Top = 0
-            Width = 8
-            Height = 592
+            Width = 5
+            Height = 395
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
             Margins.Bottom = 5
-            ExplicitHeight = 150
+            ExplicitHeight = 100
           end
           object PanelFileLeft: TPanel
             Left = 0
             Top = 0
-            Width = 300
-            Height = 592
+            Width = 200
+            Height = 395
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -331,8 +340,8 @@ object ChatDialog: TChatDialog
             object LabelFiles: TLabel
               Left = 0
               Top = 0
-              Width = 300
-              Height = 25
+              Width = 200
+              Height = 17
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -341,18 +350,18 @@ object ChatDialog: TChatDialog
               Caption = '  Detected Files'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
-              Font.Height = -18
+              Font.Height = -12
               Font.Name = 'Segoe UI'
               Font.Style = [fsBold]
               ParentFont = False
               Layout = tlCenter
-              ExplicitWidth = 129
+              ExplicitWidth = 86
             end
             object ListFiles: TListBox
               Left = 0
-              Top = 25
-              Width = 300
-              Height = 567
+              Top = 17
+              Width = 200
+              Height = 378
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -364,10 +373,10 @@ object ChatDialog: TChatDialog
             end
           end
           object MemoFilePreview: TMemo
-            Left = 308
+            Left = 205
             Top = 0
-            Width = 374
-            Height = 592
+            Width = 249
+            Height = 395
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -375,7 +384,7 @@ object ChatDialog: TChatDialog
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
-            Font.Height = -23
+            Font.Height = -15
             Font.Name = 'Consolas'
             Font.Style = []
             ParentFont = False
@@ -386,9 +395,9 @@ object ChatDialog: TChatDialog
           end
           object PanelFileBtns: TPanel
             Left = 0
-            Top = 592
-            Width = 682
-            Height = 72
+            Top = 395
+            Width = 455
+            Height = 48
             Margins.Left = 5
             Margins.Top = 5
             Margins.Right = 5
@@ -397,10 +406,10 @@ object ChatDialog: TChatDialog
             BevelOuter = bvNone
             TabOrder = 2
             object BtnSaveSelected: TButton
-              Left = 12
-              Top = 14
-              Width = 195
-              Height = 45
+              Left = 8
+              Top = 9
+              Width = 130
+              Height = 30
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -410,10 +419,10 @@ object ChatDialog: TChatDialog
               OnClick = BtnSaveSelectedClick
             end
             object BtnSaveAll: TButton
-              Left = 222
-              Top = 14
-              Width = 150
-              Height = 45
+              Left = 148
+              Top = 9
+              Width = 100
+              Height = 30
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -423,10 +432,10 @@ object ChatDialog: TChatDialog
               OnClick = BtnSaveAllClick
             end
             object BtnOpenInIDE: TButton
-              Left = 387
-              Top = 14
-              Width = 150
-              Height = 45
+              Left = 258
+              Top = 9
+              Width = 100
+              Height = 30
               Margins.Left = 5
               Margins.Top = 5
               Margins.Right = 5
@@ -440,10 +449,10 @@ object ChatDialog: TChatDialog
       end
     end
     object PanelHistory: TPanel
-      Left = 698
+      Left = 465
       Top = 0
-      Width = 679
-      Height = 704
+      Width = 453
+      Height = 469
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -454,8 +463,8 @@ object ChatDialog: TChatDialog
       object LabelHistory: TLabel
         Left = 0
         Top = 0
-        Width = 679
-        Height = 25
+        Width = 453
+        Height = 17
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -464,18 +473,18 @@ object ChatDialog: TChatDialog
         Caption = '  Conversation'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
-        Font.Height = -18
+        Font.Height = -12
         Font.Name = 'Segoe UI'
         Font.Style = [fsBold]
         ParentFont = False
         Layout = tlCenter
-        ExplicitWidth = 122
+        ExplicitWidth = 81
       end
       object MemoHistory: TMemo
         Left = 0
-        Top = 25
-        Width = 679
-        Height = 679
+        Top = 17
+        Width = 453
+        Height = 453
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -483,7 +492,7 @@ object ChatDialog: TChatDialog
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
-        Font.Height = -23
+        Font.Height = -15
         Font.Name = 'Consolas'
         Font.Style = []
         ParentFont = False

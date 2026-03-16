@@ -1,27 +1,24 @@
-object AboutDialog: TAboutDialog
+﻿object AboutDialog: TAboutDialog
   Left = 0
   Top = 0
   BorderStyle = bsDialog
   Caption = 'About Cypheros AI Assistant'
-  ClientHeight = 527
-  ClientWidth = 600
+  ClientHeight = 351
+  ClientWidth = 400
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindow
-  Font.Height = -18
+  Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  PixelsPerInch = 144
-  DesignSize = (
-    600
-    527)
   TextHeight = 25
+  PixelsPerInch = 96
   object LabelVersion: TLabel
-    Left = 30
-    Top = 114
-    Width = 62
-    Height = 25
+    Left = 20
+    Top = 76
+    Width = 41
+    Height = 17
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -29,16 +26,16 @@ object AboutDialog: TAboutDialog
     Caption = 'Version:'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end
   object LabelDev: TLabel
-    Left = 30
-    Top = 150
-    Width = 170
-    Height = 25
+    Left = 20
+    Top = 100
+    Width = 113
+    Height = 17
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -46,16 +43,16 @@ object AboutDialog: TAboutDialog
     Caption = 'Developer: Frank Siek'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end
   object Bevel1: TBevel
-    Left = 18
-    Top = 189
-    Width = 564
-    Height = 12
+    Left = 12
+    Top = 126
+    Width = 376
+    Height = 8
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -63,10 +60,10 @@ object AboutDialog: TAboutDialog
     Shape = bsTopLine
   end
   object LabelLicenseGPLText: TLabel
-    Left = 30
-    Top = 210
-    Width = 379
-    Height = 25
+    Left = 20
+    Top = 140
+    Width = 253
+    Height = 17
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -74,16 +71,16 @@ object AboutDialog: TAboutDialog
     Caption = 'This software is open source, released under the'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end
   object LinkLicenseGPL: TLabel
-    Left = 30
-    Top = 237
-    Width = 344
-    Height = 25
+    Left = 20
+    Top = 158
+    Width = 229
+    Height = 17
     Cursor = crHandPoint
     Margins.Left = 5
     Margins.Top = 5
@@ -92,17 +89,17 @@ object AboutDialog: TAboutDialog
     Caption = 'GNU General Public License v2 (GPL-2.0)'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold, fsUnderline]
     ParentFont = False
     OnClick = LinkLicenseGPLClick
   end
   object Bevel2: TBevel
-    Left = 18
-    Top = 404
-    Width = 564
-    Height = 12
+    Left = 12
+    Top = 269
+    Width = 376
+    Height = 8
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -112,10 +109,10 @@ object AboutDialog: TAboutDialog
     ExplicitTop = 279
   end
   object LinkWebsite: TLabel
-    Left = 30
-    Top = 425
-    Width = 214
-    Height = 25
+    Left = 20
+    Top = 283
+    Width = 143
+    Height = 17
     Cursor = crHandPoint
     Margins.Left = 5
     Margins.Top = 5
@@ -125,17 +122,17 @@ object AboutDialog: TAboutDialog
     Caption = 'https://www.cypheros.de'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold, fsUnderline]
     ParentFont = False
     OnClick = LinkWebsiteClick
   end
   object LabelLicenseMITText: TLabel
-    Left = 30
-    Top = 276
-    Width = 473
-    Height = 25
+    Left = 20
+    Top = 184
+    Width = 315
+    Height = 17
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -143,35 +140,35 @@ object AboutDialog: TAboutDialog
     Caption = 'The SSH-Pascal parts of this software are released under the'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end
   object LinkLicenseMIT: TLabel
-    Left = 30
-    Top = 303
-    Width = 34
-    Height = 25
+    Left = 20
+    Top = 202
+    Width = 65
+    Height = 17
     Cursor = crHandPoint
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
     Margins.Bottom = 5
-    Caption = 'MIT'
+    Caption = 'MIT license'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold, fsUnderline]
     ParentFont = False
     OnClick = LinkLicenseMITClick
   end
   object LabelSourceCode: TLabel
-    Left = 30
-    Top = 342
-    Width = 98
-    Height = 25
+    Left = 20
+    Top = 228
+    Width = 65
+    Height = 17
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -179,16 +176,16 @@ object AboutDialog: TAboutDialog
     Caption = 'Source code'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end
   object LinkSourceCode: TLabel
-    Left = 30
-    Top = 369
-    Width = 480
-    Height = 25
+    Left = 20
+    Top = 246
+    Width = 320
+    Height = 17
     Cursor = crHandPoint
     Margins.Left = 5
     Margins.Top = 5
@@ -197,7 +194,7 @@ object AboutDialog: TAboutDialog
     Caption = 'https://github.com/Cypheros-de/AI-Assistant-for-Delphi'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -18
+    Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold, fsUnderline]
     ParentFont = False
@@ -206,8 +203,8 @@ object AboutDialog: TAboutDialog
   object PanelHeader: TPanel
     Left = 0
     Top = 0
-    Width = 600
-    Height = 84
+    Width = 400
+    Height = 56
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -219,7 +216,7 @@ object AboutDialog: TAboutDialog
     Color = 12607488
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindow
-    Font.Height = -35
+    Font.Height = -23
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentBackground = False
@@ -228,10 +225,10 @@ object AboutDialog: TAboutDialog
     StyleElements = [seFont, seBorder]
   end
   object BtnClose: TButton
-    Left = 456
-    Top = 467
-    Width = 120
-    Height = 42
+    Left = 304
+    Top = 311
+    Width = 80
+    Height = 28
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
