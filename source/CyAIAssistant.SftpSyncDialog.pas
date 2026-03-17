@@ -64,7 +64,6 @@ type
         LabelWatchedExts    : TLabel;
         LabelWatchedExtsHint: TLabel;
         EditWatchedExts     : TEdit;
-        LabelPermissions : TLabel;
         // User
         CheckPermUserRead : TCheckBox;
         CheckPermUserWrite: TCheckBox;
@@ -82,6 +81,7 @@ type
         MemoLog     : TMemo;
         PanelLogBtns: TPanel;
           BtnClearLog: TButton;
+    GroupBoxPermissions: TGroupBox;
     // -- Events ----------------------------------------------------------
     procedure BtnStartStopClick(Sender: TObject);
     procedure BtnTestConnectionClick(Sender: TObject);
@@ -211,23 +211,73 @@ end;
 
 function TSftpSyncDialog.GetActiveProjectPath: string;
 var
-  ModSvc : IOTAModuleServices;
-  Module : IOTAModule;
-  Project: IOTAProject;
-  I      : Integer;
+  ModSvc    : IOTAModuleServices;
+  ProjGroup : IOTAProjectGroup;
+  Project   : IOTAProject;
+  Module    : IOTAModule;
+  EditSvc   : IOTAEditorServices;
+  FileName  : string;
+  I, J, K   : Integer;
 begin
   Result := '';
   if not Supports(BorlandIDEServices, IOTAModuleServices, ModSvc) then Exit;
 
-  // Try the currently active module first
-  Module := ModSvc.CurrentModule;
-  if Supports(Module, IOTAProject, Project) then
+  // --- Strategy 1: MainProjectGroup.ActiveProject -------------------------
+  // IOTAModuleServices.MainProjectGroup returns the top-level project group.
+  // ActiveProject within that group is what the IDE considers "current".
+  ProjGroup := ModSvc.MainProjectGroup;
+  if Assigned(ProjGroup) and Assigned(ProjGroup.ActiveProject) then
   begin
-    Result := TPath.GetDirectoryName(Project.FileName);
+    Result := TPath.GetDirectoryName(ProjGroup.ActiveProject.FileName);
     Exit;
   end;
 
-  // Fall back: scan all open modules for the first IOTAProject
+  // --- Strategy 2: match the open editor file to its owning project -------
+  FileName := '';
+  if Supports(BorlandIDEServices, IOTAEditorServices, EditSvc) then
+    if Assigned(EditSvc.TopBuffer) then
+      FileName := EditSvc.TopBuffer.FileName;
+
+  if FileName <> '' then
+  begin
+    for I := 0 to ModSvc.ModuleCount - 1 do
+    begin
+      Module := ModSvc.Modules[I];
+      if Supports(Module, IOTAProjectGroup, ProjGroup) then
+      begin
+        for J := 0 to ProjGroup.ProjectCount - 1 do
+        begin
+          Project := ProjGroup.Projects[J];
+          if not Assigned(Project) then Continue;
+          for K := 0 to Project.GetModuleCount - 1 do
+          begin
+            var Mod2 := Project.GetModule(K);
+            if Assigned(Mod2) and
+               SameText(Mod2.FileName, FileName) then
+            begin
+              Result := TPath.GetDirectoryName(Project.FileName);
+              Exit;
+            end;
+          end;
+        end;
+      end
+      else if Supports(Module, IOTAProject, Project) then
+      begin
+        for K := 0 to Project.GetModuleCount - 1 do
+        begin
+          var Mod2 := Project.GetModule(K);
+          if Assigned(Mod2) and
+             SameText(Mod2.FileName, FileName) then
+          begin
+            Result := TPath.GetDirectoryName(Project.FileName);
+            Exit;
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  // --- Strategy 3: first IOTAProject found --------------------------------
   for I := 0 to ModSvc.ModuleCount - 1 do
   begin
     Module := ModSvc.Modules[I];

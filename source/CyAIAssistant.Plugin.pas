@@ -160,16 +160,28 @@ end;
 
 function TCyAIAssistantPlugin.HasOpenProject: Boolean;
 var
-  ModSvc: IOTAModuleServices;
-  I     : Integer;
-  Module: IOTAModule;
+  ModSvc   : IOTAModuleServices;
+  ProjGroup: IOTAProjectGroup;
+  Module   : IOTAModule;
+  I        : Integer;
 begin
   Result := False;
   if not Supports(BorlandIDEServices, IOTAModuleServices, ModSvc) then Exit;
+
+  // MainProjectGroup.ActiveProject is the most direct check
+  ProjGroup := ModSvc.MainProjectGroup;
+  if Assigned(ProjGroup) and Assigned(ProjGroup.ActiveProject) then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  // Fallback: any IOTAProject or IOTAProjectGroup in the module list
   for I := 0 to ModSvc.ModuleCount - 1 do
   begin
     Module := ModSvc.Modules[I];
-    if Supports(Module, IOTAProject) then
+    if Supports(Module, IOTAProject) or
+       Supports(Module, IOTAProjectGroup) then
     begin
       Result := True;
       Exit;

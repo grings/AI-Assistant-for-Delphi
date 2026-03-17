@@ -1,23 +1,24 @@
-﻿object SftpSyncDialog: TSftpSyncDialog
+object SftpSyncDialog: TSftpSyncDialog
   Left = 0
   Top = 0
   Caption = 'SFTP Sync Settings'
   ClientHeight = 467
-  ClientWidth = 700
+  ClientWidth = 650
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OldCreateOrder = True
   Position = poOwnerFormCenter
   OnClose = FormClose
-  TextHeight = 25
   PixelsPerInch = 96
+  TextHeight = 15
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 700
+    Width = 650
     Height = 52
     Margins.Left = 5
     Margins.Top = 5
@@ -30,8 +31,8 @@
     TabOrder = 1
     StyleElements = [seFont, seBorder]
     DesignSize = (
-      1050
-      78)
+      650
+      52)
     object LabelTitle: TLabel
       Left = 14
       Top = 14
@@ -50,10 +51,10 @@
       ParentFont = False
     end
     object LabelStatus: TLabel
-      Left = 630
+      Left = 579
       Top = 17
-      Width = 40
-      Height = 17
+      Width = 41
+      Height = 15
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
@@ -67,12 +68,13 @@
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 629
     end
   end
   object PanelBottom: TPanel
     Left = 0
     Top = 425
-    Width = 700
+    Width = 650
     Height = 42
     Margins.Left = 5
     Margins.Top = 5
@@ -82,8 +84,8 @@
     BevelOuter = bvNone
     TabOrder = 2
     DesignSize = (
-      1050
-      63)
+      650
+      42)
     object BtnStartStop: TButton
       Left = 10
       Top = 7
@@ -117,7 +119,7 @@
       OnClick = BtnTestConnectionClick
     end
     object BtnClose: TButton
-      Left = 610
+      Left = 560
       Top = 7
       Width = 80
       Height = 28
@@ -134,7 +136,7 @@
   object PageControl: TPageControl
     Left = 0
     Top = 52
-    Width = 700
+    Width = 650
     Height = 373
     Margins.Left = 5
     Margins.Top = 5
@@ -153,7 +155,7 @@
         Left = 14
         Top = 20
         Width = 78
-        Height = 17
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -163,8 +165,8 @@
       object LabelPort: TLabel
         Left = 14
         Top = 56
-        Width = 24
-        Height = 17
+        Width = 25
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -174,8 +176,8 @@
       object LabelUser: TLabel
         Left = 14
         Top = 92
-        Width = 55
-        Height = 17
+        Width = 56
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -186,7 +188,7 @@
         Left = 14
         Top = 128
         Width = 53
-        Height = 17
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -196,8 +198,8 @@
       object LabelKeyPath: TLabel
         Left = 14
         Top = 172
-        Width = 114
-        Height = 17
+        Width = 116
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -207,8 +209,8 @@
       object LabelKeyNote: TLabel
         Left = 14
         Top = 260
-        Width = 413
-        Height = 17
+        Width = 412
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -226,8 +228,8 @@
       object LabelPubKeyPath: TLabel
         Left = 14
         Top = 208
-        Width = 110
-        Height = 17
+        Width = 113
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -238,7 +240,7 @@
         Left = 160
         Top = 16
         Width = 300
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -249,7 +251,7 @@
         Left = 160
         Top = 52
         Width = 80
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -261,7 +263,7 @@
         Left = 160
         Top = 88
         Width = 200
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -272,7 +274,7 @@
         Left = 160
         Top = 124
         Width = 200
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -284,7 +286,7 @@
         Left = 160
         Top = 168
         Width = 360
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -308,7 +310,7 @@
         Left = 160
         Top = 204
         Width = 360
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -338,8 +340,8 @@
       object LabelLocalBase: TLabel
         Left = 14
         Top = 20
-        Width = 105
-        Height = 17
+        Width = 107
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -349,8 +351,8 @@
       object LabelRemoteBase: TLabel
         Left = 14
         Top = 64
-        Width = 97
-        Height = 17
+        Width = 98
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -360,8 +362,8 @@
       object LabelPathNote: TLabel
         Left = 14
         Top = 108
-        Width = 457
-        Height = 17
+        Width = 455
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -380,7 +382,7 @@
         Left = 160
         Top = 16
         Width = 380
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -404,7 +406,7 @@
         Left = 160
         Top = 60
         Width = 460
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -449,8 +451,8 @@
       object LabelInterval: TLabel
         Left = 14
         Top = 20
-        Width = 121
-        Height = 17
+        Width = 124
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -460,8 +462,8 @@
       object LabelIntervalNote: TLabel
         Left = 14
         Top = 56
-        Width = 418
-        Height = 17
+        Width = 419
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -479,8 +481,8 @@
       object LabelWatchedExts: TLabel
         Left = 14
         Top = 136
-        Width = 126
-        Height = 17
+        Width = 127
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -490,8 +492,8 @@
       object LabelWatchedExtsHint: TLabel
         Left = 14
         Top = 162
-        Width = 435
-        Height = 17
+        Width = 432
+        Height = 15
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -506,22 +508,11 @@
         Font.Style = []
         ParentFont = False
       end
-      object LabelPermissions: TLabel
-        Left = 13
-        Top = 206
-        Width = 129
-        Height = 17
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Remote file permissions:'
-      end
       object EditInterval: TEdit
         Left = 200
         Top = 16
         Width = 80
-        Height = 22
+        Height = 23
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -545,7 +536,7 @@
         Left = 190
         Top = 132
         Width = 390
-        Height = 22
+        Height = 23
         Hint = 'Space or comma separated list, e.g.: .pas .dfm .dpr .dproj'
         Margins.Left = 5
         Margins.Top = 5
@@ -553,115 +544,123 @@
         Margins.Bottom = 5
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 11
-      end
-      object CheckPermUserRead: TCheckBox
-        Left = 13
-        Top = 234
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'User Read'
         TabOrder = 2
       end
-      object CheckPermUserWrite: TCheckBox
-        Left = 127
-        Top = 234
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'User Write'
+      object GroupBoxPermissions: TGroupBox
+        Left = 14
+        Top = 202
+        Width = 373
+        Height = 129
+        Caption = 'Remote file permissions'
         TabOrder = 3
-      end
-      object CheckPermUserExec: TCheckBox
-        Left = 243
-        Top = 234
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'User Exec'
-        TabOrder = 4
-      end
-      object CheckPermGroupRead: TCheckBox
-        Left = 13
-        Top = 304
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Group Read'
-        TabOrder = 5
-      end
-      object CheckPermGroupWrite: TCheckBox
-        Left = 127
-        Top = 304
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Group Write'
-        TabOrder = 6
-      end
-      object CheckPermGroupExec: TCheckBox
-        Left = 243
-        Top = 304
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Group Exec'
-        TabOrder = 7
-      end
-      object CheckPermOtherRead: TCheckBox
-        Left = 13
-        Top = 270
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Other Read'
-        TabOrder = 8
-      end
-      object CheckPermOtherWrite: TCheckBox
-        Left = 127
-        Top = 270
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Other Write'
-        TabOrder = 9
-      end
-      object CheckPermOtherExec: TCheckBox
-        Left = 243
-        Top = 270
-        Width = 110
-        Height = 20
-        Margins.Left = 5
-        Margins.Top = 5
-        Margins.Right = 5
-        Margins.Bottom = 5
-        Caption = 'Other Exec'
-        TabOrder = 10
+        object CheckPermGroupRead: TCheckBox
+          Left = 32
+          Top = 60
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'Group Read'
+          TabOrder = 0
+        end
+        object CheckPermUserExec: TCheckBox
+          Left = 262
+          Top = 30
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'User Exec'
+          TabOrder = 1
+        end
+        object CheckPermUserWrite: TCheckBox
+          Left = 145
+          Top = 30
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'User Write'
+          TabOrder = 2
+        end
+        object CheckPermUserRead: TCheckBox
+          Left = 32
+          Top = 30
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'User Read'
+          TabOrder = 3
+        end
+        object CheckPermGroupWrite: TCheckBox
+          Left = 145
+          Top = 60
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'Group Write'
+          TabOrder = 4
+        end
+        object CheckPermOtherExec: TCheckBox
+          Left = 262
+          Top = 90
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'Other Exec'
+          TabOrder = 5
+        end
+        object CheckPermOtherWrite: TCheckBox
+          Left = 145
+          Top = 90
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'Other Write'
+          TabOrder = 6
+        end
+        object CheckPermOtherRead: TCheckBox
+          Left = 32
+          Top = 90
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'Other Read'
+          TabOrder = 7
+        end
+        object CheckPermGroupExec: TCheckBox
+          Left = 262
+          Top = 60
+          Width = 110
+          Height = 20
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Caption = 'Group Exec'
+          TabOrder = 8
+        end
       end
     end
     object TabLog: TTabSheet
@@ -673,8 +672,8 @@
       object MemoLog: TMemo
         Left = 0
         Top = 0
-        Width = 695
-        Height = 318
+        Width = 642
+        Height = 315
         Margins.Left = 5
         Margins.Top = 5
         Margins.Right = 5
@@ -690,11 +689,12 @@
         ScrollBars = ssVertical
         TabOrder = 0
         WordWrap = False
+        ExplicitWidth = 692
       end
       object PanelLogBtns: TPanel
         Left = 0
-        Top = 318
-        Width = 695
+        Top = 315
+        Width = 642
         Height = 28
         Margins.Left = 5
         Margins.Top = 5
@@ -703,6 +703,7 @@
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitWidth = 692
         object BtnClearLog: TButton
           Left = 4
           Top = 2

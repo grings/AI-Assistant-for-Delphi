@@ -1,0 +1,15 @@
+[SftpSync]
+Host=172.31.6.77
+Port=22
+User=delphi
+Pass=netman
+KeyPath=
+PubKeyPath=
+LocalBase=D:\Git\AI-Assistant-for-Delphi\source
+RemoteBase=/Files/source
+Interval=5
+SubDirs=1
+AutoDetect=1
+AutoStart=0
+Permissions=509
+WatchedExts=
