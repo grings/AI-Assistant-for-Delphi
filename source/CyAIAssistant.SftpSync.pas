@@ -728,8 +728,12 @@ begin
     Rel := StringReplace(Rel, '\', '/', [rfReplaceAll]);
 
     Info.RelPath := Rel;
-    Info.Size := GetFileSize(F); // Delphi 10 compatible //TFile.GetSize(F);
-    Info.MTime := TFile.GetLastWriteTime(F); // local time
+    Info.Size := GetFileSize(F);
+    try
+      Info.MTime := TFile.GetLastWriteTime(F); // local time
+    except
+      Continue; // file temporarily inaccessible (e.g. locked by another process) -- skip for this cycle
+    end;
     AList.Add(Info);
   end;
 end;
@@ -1065,6 +1069,11 @@ begin
       begin
         Key := LowerCase(RInfo.RelPath);
         if LocalMap.ContainsKey(Key) then
+          Continue;
+        // Guard: file may exist locally but was skipped during scan (e.g. temporarily locked).
+        // Let the next cycle handle it via the normal both-sides comparison.
+        LocalPath := FLocalBasePath + PathDelim + StringReplace(RInfo.RelPath, '/', PathDelim, [rfReplaceAll]);
+        if TFile.Exists(LocalPath) then
           Continue;
         try
           DownloadFile(RInfo.RelPath, Sftp);

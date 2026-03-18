@@ -16,11 +16,6 @@
 // Returns True when the current IDE theme has a dark background.
 // Determined by computing the luminance of clWindow from StyleServices.
 // Luminance < 128  →  dark theme.
-//
-// IDEThemeLinkColor / IDEThemeLinkHoverColor
-// Return link colors appropriate for the active theme:
-// Dark  theme → bright orange  #FF8C00 / bright blue  #6CB4FF
-// Light theme → dark  orange   #CC6600 / standard blue #0000CC
 
 interface
 
@@ -33,8 +28,6 @@ procedure RegisterIDEThemeForm(AFormClass: TCustomFormClass);
 procedure ApplyIDETheme(AForm: TCustomForm);
 
 function IDEThemeIsDark: Boolean;
-function IDEThemeLinkColor: TColor;
-function IDEThemeLinkHoverColor: TColor;
 
 implementation
 
@@ -89,22 +82,6 @@ begin
 
   Lum := Luminance(ColorToRGB(BgColor));
   Result := Lum < 128;
-end;
-
-function IDEThemeLinkColor: TColor;
-begin
-  if IDEThemeIsDark then
-    Result := $0040B8FF // amber  RGB(255,184,64)  — warm, visible on dark bg
-  else
-    Result := $000066CC; // dark orange RGB(204,102,0) — visible on light bg
-end;
-
-function IDEThemeLinkHoverColor: TColor;
-begin
-  if IDEThemeIsDark then
-    Result := $00FFFFFF // bright white — unmistakably different from amber
-  else
-    Result := $00CC0000; // standard blue RGB(0,0,204)
 end;
 
 // ---------------------------------------------------------------------------

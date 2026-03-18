@@ -81,7 +81,6 @@ type
 
     // Single-turn
     procedure SendAsync(const APrompt: string; ACallback: TAIResultCallback);
-    function SendSync(const APrompt: string; out AError: string): string;
 
     // Multi-turn chat
     procedure SendChatAsync(const AHistory: TArray<TChatMessage>; ACallback: TAIResultCallback);
@@ -690,26 +689,6 @@ begin
           SendOpenAICompatible(APrompt, GSettings.MistralEndpoint, GSettings.MistralAPIKey, GSettings.MistralModel, ACallback);
       end;
     end);
-end;
-
-function TAIClient.SendSync(const APrompt: string; out AError: string): string;
-var
-  Done: Boolean;
-  ResultStr: string;
-  ErrorStr: string;
-begin
-  Done := False;
-  SendAsync(APrompt,
-    procedure(const AResult, AErr: string)
-    begin
-      ResultStr := AResult;
-      ErrorStr := AErr;
-      Done := True;
-    end);
-  while not Done do
-    Sleep(50);
-  AError := ErrorStr;
-  Result := ResultStr;
 end;
 
 // ---------------------------------------------------------------------------
