@@ -2,7 +2,7 @@ object SftpSyncDialog: TSftpSyncDialog
   Left = 0
   Top = 0
   Caption = 'SFTP Sync Settings'
-  ClientHeight = 467
+  ClientHeight = 493
   ClientWidth = 650
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -73,7 +73,7 @@ object SftpSyncDialog: TSftpSyncDialog
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 425
+    Top = 451
     Width = 650
     Height = 42
     Margins.Left = 5
@@ -117,6 +117,34 @@ object SftpSyncDialog: TSftpSyncDialog
       Caption = 'Test Connection'
       TabOrder = 1
       OnClick = BtnTestConnectionClick
+    end
+    object BtnPushAll: TButton
+      Left = 258
+      Top = 7
+      Width = 90
+      Height = 28
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Push All'
+      Enabled = False
+      TabOrder = 3
+      OnClick = BtnPushAllClick
+    end
+    object BtnPullAll: TButton
+      Left = 356
+      Top = 7
+      Width = 90
+      Height = 28
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Pull All'
+      Enabled = False
+      TabOrder = 4
+      OnClick = BtnPullAllClick
     end
     object BtnClose: TButton
       Left = 560
@@ -480,7 +508,7 @@ object SftpSyncDialog: TSftpSyncDialog
       end
       object LabelWatchedExts: TLabel
         Left = 14
-        Top = 136
+        Top = 162
         Width = 127
         Height = 15
         Margins.Left = 5
@@ -491,7 +519,7 @@ object SftpSyncDialog: TSftpSyncDialog
       end
       object LabelWatchedExtsHint: TLabel
         Left = 14
-        Top = 162
+        Top = 188
         Width = 432
         Height = 15
         Margins.Left = 5
@@ -532,9 +560,21 @@ object SftpSyncDialog: TSftpSyncDialog
         Caption = 'Start sync automatically when a project is opened in the IDE'
         TabOrder = 1
       end
+      object CheckBackupEnabled: TCheckBox
+        Left = 14
+        Top = 116
+        Width = 500
+        Height = 20
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Caption = 'Backup overwritten local files to __backup\backup_NNN.zip before downloading'
+        TabOrder = 2
+      end
       object EditWatchedExts: TEdit
         Left = 190
-        Top = 132
+        Top = 158
         Width = 390
         Height = 23
         Hint = 'Space or comma separated list, e.g.: .pas .dfm .dpr .dproj'
@@ -544,15 +584,15 @@ object SftpSyncDialog: TSftpSyncDialog
         Margins.Bottom = 5
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 2
+        TabOrder = 3
       end
       object GroupBoxPermissions: TGroupBox
         Left = 14
-        Top = 202
+        Top = 228
         Width = 373
         Height = 129
         Caption = 'Remote file permissions'
-        TabOrder = 3
+        TabOrder = 4
         object CheckPermGroupRead: TCheckBox
           Left = 32
           Top = 60

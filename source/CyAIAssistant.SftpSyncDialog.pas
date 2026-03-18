@@ -26,6 +26,8 @@ type
     PanelBottom     : TPanel;
       BtnStartStop      : TButton;
       BtnTestConnection : TButton;
+      BtnPushAll        : TButton;
+      BtnPullAll        : TButton;
       BtnClose          : TButton;
     PageControl     : TPageControl;
       // Tab: Connection
@@ -61,6 +63,7 @@ type
         LabelIntervalNote: TLabel;
         EditInterval     : TEdit;
         CheckStartWithProject: TCheckBox;
+        CheckBackupEnabled   : TCheckBox;
         LabelWatchedExts    : TLabel;
         LabelWatchedExtsHint: TLabel;
         EditWatchedExts     : TEdit;
@@ -85,6 +88,8 @@ type
     // -- Events ----------------------------------------------------------
     procedure BtnStartStopClick(Sender: TObject);
     procedure BtnTestConnectionClick(Sender: TObject);
+    procedure BtnPushAllClick(Sender: TObject);
+    procedure BtnPullAllClick(Sender: TObject);
     procedure BtnBrowseKeyClick(Sender: TObject);
     procedure BtnBrowsePubKeyClick(Sender: TObject);
     procedure BtnBrowseLocalClick(Sender: TObject);
@@ -185,6 +190,8 @@ end;
   --------------------------------------------------------------------------- }
 
 procedure TSftpSyncDialog.UpdateStatusUI;
+var
+  CanForce: Boolean;
 begin
   if GSftpSync.IsRunning then
   begin
@@ -192,6 +199,7 @@ begin
     LabelStatus.Font.Color := clLime;
     BtnStartStop.Caption   := 'Stop Sync';
     BtnStartStop.Font.Color := clMaroon;
+    CanForce := False;
   end
   else
   begin
@@ -199,7 +207,10 @@ begin
     LabelStatus.Font.Color := clSilver;
     BtnStartStop.Caption   := 'Start Sync';
     BtnStartStop.Font.Color := clWindowText;
+    CanForce := not GSftpSync.IsBusy;
   end;
+  BtnPushAll.Enabled := CanForce;
+  BtnPullAll.Enabled := CanForce;
 end;
 
 procedure TSftpSyncDialog.OnSyncLog(const AMsg: string);
@@ -357,6 +368,7 @@ begin
     CheckIncludeSubDirs.Checked    := Ini.ReadBool   (CONFIG_SECTION, 'SubDirs',    True);
     CheckAutoDetectProject.Checked := Ini.ReadBool   (CONFIG_SECTION, 'AutoDetect', True);
     CheckStartWithProject.Checked  := Ini.ReadBool   (CONFIG_SECTION, 'AutoStart',  False);
+    CheckBackupEnabled.Checked     := Ini.ReadBool   (CONFIG_SECTION, 'Backup',     False);
     SetPermissions(IntToPerms(Ini.ReadInteger(CONFIG_SECTION, 'Permissions',
       PermsToInt(DEFAULT_PERMISSIONS))));
     EditWatchedExts.Text := Ini.ReadString(CONFIG_SECTION, 'WatchedExts',
@@ -386,6 +398,7 @@ begin
     Ini.WriteBool   (CONFIG_SECTION, 'SubDirs',     CheckIncludeSubDirs.Checked);
     Ini.WriteBool   (CONFIG_SECTION, 'AutoDetect',  CheckAutoDetectProject.Checked);
     Ini.WriteBool   (CONFIG_SECTION, 'AutoStart',   CheckStartWithProject.Checked);
+    Ini.WriteBool   (CONFIG_SECTION, 'Backup',      CheckBackupEnabled.Checked);
     Ini.WriteInteger(CONFIG_SECTION, 'Permissions', PermsToInt(GetPermissions));
     Ini.WriteString (CONFIG_SECTION, 'WatchedExts', Trim(EditWatchedExts.Text));
   finally
@@ -510,6 +523,7 @@ begin
   // Restore timestamp cache so first cycle skips already-synced files.
   GSftpSync.LoadCacheFrom(GetConfigFilePath);
 
+  GSftpSync.BackupEnabled := CheckBackupEnabled.Checked;
   GSftpSync.Start(
     Trim(EditHost.Text),
     Port,
@@ -526,6 +540,99 @@ begin
 
   UpdateStatusUI;
   PageControl.ActivePage := TabLog;
+end;
+
+{ ---------------------------------------------------------------------------
+  Push All / Pull All
+  --------------------------------------------------------------------------- }
+
+procedure TSftpSyncDialog.BtnPushAllClick(Sender: TObject);
+var
+  LocalBase: string;
+  Port: Word;
+  RemotePath: string;
+begin
+  if MessageDlg(
+      'Push All will overwrite ALL files on the remote server with your local versions.' + sLineBreak +
+      sLineBreak +
+      'Continue?',
+      mtWarning, [mbYes, mbNo], 0) <> mrYes then Exit;
+
+  LocalBase := Trim(EditLocalBase.Text);
+  if (LocalBase = '') and CheckAutoDetectProject.Checked then
+    LocalBase := GetActiveProjectPath;
+  if (LocalBase = '') or not TDirectory.Exists(LocalBase) then
+  begin
+    ShowMessage('Local project folder not found. Check the Paths tab.');
+    Exit;
+  end;
+
+  Port       := Word(StrToIntDef(EditPort.Text, 22));
+  RemotePath := Trim(EditRemoteBase.Text);
+  if RemotePath = '' then RemotePath := '/';
+
+  SaveSettings;
+  GSftpSync.BackupEnabled := CheckBackupEnabled.Checked;
+  GSftpSync.Configure(
+    Trim(EditHost.Text), Port, Trim(EditUser.Text), EditPass.Text,
+    Trim(EditKeyPath.Text), Trim(EditPubKeyPath.Text),
+    RemotePath, LocalBase,
+    CheckIncludeSubDirs.Checked, GetPermissions,
+    ParseWatchedExts(EditWatchedExts.Text));
+
+  BtnPushAll.Enabled := False;
+  BtnPullAll.Enabled := False;
+  PageControl.ActivePage := TabLog;
+  GSftpSync.ForcePushAll(
+    procedure
+    begin
+      UpdateStatusUI;
+    end);
+end;
+
+procedure TSftpSyncDialog.BtnPullAllClick(Sender: TObject);
+var
+  LocalBase: string;
+  Port: Word;
+  RemotePath: string;
+begin
+  if MessageDlg(
+      'Pull All will overwrite ALL local files with the remote versions.' + sLineBreak +
+      'Local changes not yet pushed will be lost.' + sLineBreak +
+      sLineBreak +
+      'Continue?',
+      mtWarning, [mbYes, mbNo], 0) <> mrYes then Exit;
+
+  LocalBase := Trim(EditLocalBase.Text);
+  if (LocalBase = '') and CheckAutoDetectProject.Checked then
+    LocalBase := GetActiveProjectPath;
+  if (LocalBase = '') or not TDirectory.Exists(LocalBase) then
+  begin
+    ShowMessage('Local project folder not found. Check the Paths tab.');
+    Exit;
+  end;
+
+  Port       := Word(StrToIntDef(EditPort.Text, 22));
+  RemotePath := Trim(EditRemoteBase.Text);
+  if RemotePath = '' then RemotePath := '/';
+
+  SaveSettings;
+  GSftpSync.BackupEnabled := CheckBackupEnabled.Checked;
+  GSftpSync.Configure(
+    Trim(EditHost.Text), Port, Trim(EditUser.Text), EditPass.Text,
+    Trim(EditKeyPath.Text), Trim(EditPubKeyPath.Text),
+    RemotePath, LocalBase,
+    CheckIncludeSubDirs.Checked, GetPermissions,
+    ParseWatchedExts(EditWatchedExts.Text));
+
+  BtnPushAll.Enabled := False;
+  BtnPullAll.Enabled := False;
+  PageControl.ActivePage := TabLog;
+  GSftpSync.ForcePullAll(
+    procedure
+    begin
+      UpdateStatusUI;
+    end);
 end;
 
 { ---------------------------------------------------------------------------

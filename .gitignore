@@ -1,5 +1,6 @@
 /source/__recovery
 /source/__history
+/source/__backup
 /source/*.identcache
 /source/*.local
 /lib

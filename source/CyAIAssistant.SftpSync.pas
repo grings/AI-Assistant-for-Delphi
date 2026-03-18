@@ -107,8 +107,11 @@ type
     // Per-file cache of the last timestamp seen on BOTH sides after a sync.
     // Prevents re-syncing files that were just synced in the previous cycle.
     FLastSyncedMTime: TDictionary<string, TDateTime>;
+    // -- Backup -------------------------------------------------------------
+    FBackupEnabled: Boolean;
 
     procedure Log(const AMsg: string);
+    function NextBackupZipPath: string;
     procedure OnSyncTimer(Sender: TObject);
     procedure DoSyncCycle;
     function ConnectSftp(out Session: ISshSession; out Sftp: ISftpClient): Boolean;
@@ -125,11 +128,16 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    procedure Configure(const AHost: string; APort: Word; const AUserName, APassword: string; const APrivateKeyPath, APublicKeyPath: string;
+      const ARemoteBasePath, ALocalBasePath: string; AIncludeSubDirs: Boolean; APermissions: TFilePermissions;
+      const AWatchedExts: TArray<string>);
     procedure Start(const AHost: string; APort: Word; const AUserName, APassword: string; const APrivateKeyPath, APublicKeyPath: string;
       const ARemoteBasePath, ALocalBasePath: string; AIncludeSubDirs: Boolean; AIntervalSeconds: Integer; APermissions: TFilePermissions;
       const AWatchedExts: TArray<string>);
     procedure Stop;
     function IsRunning: Boolean;
+    procedure ForcePushAll(AOnDone: TProc = nil);
+    procedure ForcePullAll(AOnDone: TProc = nil);
 
     // Cache persistence -- call from dialog's SaveSettings / LoadSettings
     procedure SaveCacheTo(const AFilePath: string);
@@ -137,6 +145,8 @@ type
 
     property LogBuffer: TStringList read FLogBuffer;
     property OnLog: TSftpLogEvent read FOnLog write FOnLog;
+    property BackupEnabled: Boolean read FBackupEnabled write FBackupEnabled;
+    property IsBusy: Boolean read FSyncBusy;
   end;
 
 var
@@ -150,6 +160,7 @@ uses
   System.Math,
   System.StrUtils,
   System.Types,
+  System.Zip,
   Vcl.Dialogs,
   Vcl.Forms;
 
@@ -299,25 +310,23 @@ begin
 end;
 
 { ---------------------------------------------------------------------------
-  Start / Stop
+  Configure / Start / Stop
   --------------------------------------------------------------------------- }
 
-procedure TSftpSyncEngine.Start(const AHost: string; APort: Word; const AUserName, APassword: string; const APrivateKeyPath, APublicKeyPath: string;
-const ARemoteBasePath, ALocalBasePath: string; AIncludeSubDirs: Boolean; AIntervalSeconds: Integer; APermissions: TFilePermissions;
-const AWatchedExts: TArray<string>);
+procedure TSftpSyncEngine.Configure(const AHost: string; APort: Word; const AUserName, APassword: string; const APrivateKeyPath, APublicKeyPath: string;
+  const ARemoteBasePath, ALocalBasePath: string; AIncludeSubDirs: Boolean; APermissions: TFilePermissions;
+  const AWatchedExts: TArray<string>);
 begin
-  Stop;
-
-  FHost := AHost;
-  FPort := APort;
-  FUserName := AUserName;
-  FPassword := APassword;
+  FHost           := AHost;
+  FPort           := APort;
+  FUserName       := AUserName;
+  FPassword       := APassword;
   FPrivateKeyPath := APrivateKeyPath;
-  FPublicKeyPath := APublicKeyPath;
+  FPublicKeyPath  := APublicKeyPath;
   FRemoteBasePath := ARemoteBasePath;
-  FLocalBasePath := ExcludeTrailingPathDelimiter(ALocalBasePath);
+  FLocalBasePath  := ExcludeTrailingPathDelimiter(ALocalBasePath);
   FIncludeSubDirs := AIncludeSubDirs;
-  FPermissions := APermissions;
+  FPermissions    := APermissions;
   // Derive directory permissions: for each class (user/group/other) that has
   // read or write access, also grant execute (= traversal for directories).
   FDirPermissions := APermissions;
@@ -327,8 +336,19 @@ begin
     Include(FDirPermissions, fpGroupExec);
   if (fpOtherRead in APermissions) or (fpOtherWrite in APermissions) then
     Include(FDirPermissions, fpOtherExec);
-  FIntervalMs := Max(1, AIntervalSeconds) * 1000;
   FWatchedExts := AWatchedExts;
+end;
+
+procedure TSftpSyncEngine.Start(const AHost: string; APort: Word; const AUserName, APassword: string; const APrivateKeyPath, APublicKeyPath: string;
+const ARemoteBasePath, ALocalBasePath: string; AIncludeSubDirs: Boolean; AIntervalSeconds: Integer; APermissions: TFilePermissions;
+const AWatchedExts: TArray<string>);
+begin
+  Stop;
+
+  Configure(AHost, APort, AUserName, APassword, APrivateKeyPath, APublicKeyPath,
+    ARemoteBasePath, ALocalBasePath, AIncludeSubDirs, APermissions, AWatchedExts);
+
+  FIntervalMs := Max(1, AIntervalSeconds) * 1000;
   FSyncBusy := False;
   // FLastSyncedMTime is populated by LoadCacheFrom (called by dialog before
   // Start) -- do NOT clear it here or the restored cache is lost.
@@ -351,6 +371,200 @@ begin
   FSyncTimer.Enabled := False;
   StopWatchThread;
   Log('Sync stopped.');
+end;
+
+{ ---------------------------------------------------------------------------
+  ForcePushAll -- upload every local file unconditionally
+  --------------------------------------------------------------------------- }
+
+procedure TSftpSyncEngine.ForcePushAll(AOnDone: TProc = nil);
+var
+  Self_: TSftpSyncEngine;
+begin
+  if FSyncBusy then Exit;
+  if FHost = '' then
+  begin
+    Log('Push All: not configured — fill in the settings and click Start once first.');
+    Exit;
+  end;
+  FSyncBusy := True;
+  Self_ := Self;
+  TTask.Run(TProc(
+    procedure
+    var
+      Session: ISshSession;
+      Sftp: ISftpClient;
+      LocalList: TList<TSyncFileInfo>;
+      LInfo: TSyncFileInfo;
+      Pushed: Integer;
+    begin
+      Session := nil;
+      Sftp    := nil;
+      LocalList := TList<TSyncFileInfo>.Create;
+      try
+        try
+          Self_.CollectLocalFiles(LocalList);
+          if LocalList.Count = 0 then
+          begin
+            Self_.Log('Push All: no local files found in: ' + Self_.FLocalBasePath);
+            Exit;
+          end;
+          if not Self_.ConnectSftp(Session, Sftp) then
+            Exit;
+          if not Sftp.DirectoryExists(Self_.FRemoteBasePath) then
+          begin
+            Self_.EnsureRemoteDir(Self_.FRemoteBasePath, Sftp);
+            Self_.Log('Created remote directory: ' + Self_.FRemoteBasePath);
+          end;
+          Pushed := 0;
+          for LInfo in LocalList do
+          begin
+            try
+              Self_.UploadFile(LInfo.RelPath, Sftp);
+              Inc(Pushed);
+            except
+              on E: Exception do
+                Self_.Log('[PUSH FAILED] ' + TPath.GetFileName(LInfo.RelPath) + '  (' + E.Message + ')');
+            end;
+          end;
+          Self_.Log('Push All complete: ' + IntToStr(Pushed) + ' / ' + IntToStr(LocalList.Count) + ' file(s) uploaded.');
+        except
+          on E: Exception do
+            Self_.Log('Push All error: ' + E.Message);
+        end;
+      finally
+        try Sftp := nil; except end;
+        try
+          if Assigned(Session) then
+          begin
+            Session.Disconnect;
+            Session := nil;
+          end;
+        except
+        end;
+        Sleep(200);
+        LocalList.Free;
+        TMainThreadRunner.Queue(
+          procedure
+          begin
+            Self_.FSyncBusy := False;
+            if Assigned(AOnDone) then AOnDone;
+          end);
+      end;
+    end));
+end;
+
+{ ---------------------------------------------------------------------------
+  ForcePullAll -- download every remote file unconditionally
+  --------------------------------------------------------------------------- }
+
+procedure TSftpSyncEngine.ForcePullAll(AOnDone: TProc = nil);
+var
+  Self_: TSftpSyncEngine;
+begin
+  if FSyncBusy then Exit;
+  if FHost = '' then
+  begin
+    Log('Pull All: not configured — fill in the settings and click Start once first.');
+    Exit;
+  end;
+  FSyncBusy := True;
+  Self_ := Self;
+  TTask.Run(TProc(
+    procedure
+    var
+      Session: ISshSession;
+      Sftp: ISftpClient;
+      RemoteList: TList<TSyncFileInfo>;
+      RInfo: TSyncFileInfo;
+      Pulled: Integer;
+      BackupZip: TZipFile;
+      BackupZipPath: string;
+      BackedUp: Integer;
+      LocalPath: string;
+    begin
+      Session   := nil;
+      Sftp      := nil;
+      RemoteList := TList<TSyncFileInfo>.Create;
+      BackupZip := nil;
+      BackupZipPath := '';
+      BackedUp  := 0;
+      try
+        try
+          if not Self_.ConnectSftp(Session, Sftp) then
+            Exit;
+          Self_.CollectRemoteFiles(Sftp, Self_.FRemoteBasePath, RemoteList, Self_.FIncludeSubDirs);
+          if RemoteList.Count = 0 then
+          begin
+            Self_.Log('Pull All: no remote files found in: ' + Self_.FRemoteBasePath);
+            Exit;
+          end;
+          Pulled := 0;
+          for RInfo in RemoteList do
+          begin
+            // Backup existing local file before overwriting
+            if Self_.FBackupEnabled then
+            begin
+              LocalPath := Self_.FLocalBasePath + PathDelim +
+                StringReplace(RInfo.RelPath, '/', PathDelim, [rfReplaceAll]);
+              if TFile.Exists(LocalPath) then
+              begin
+                if BackupZip = nil then
+                begin
+                  BackupZipPath := Self_.NextBackupZipPath;
+                  BackupZip := TZipFile.Create;
+                  BackupZip.Open(BackupZipPath, zmWrite);
+                end;
+                try
+                  BackupZip.Add(LocalPath, RInfo.RelPath);
+                  Inc(BackedUp);
+                except
+                  on E: Exception do
+                    Self_.Log('[BACKUP FAILED] ' + TPath.GetFileName(RInfo.RelPath) + '  (' + E.Message + ')');
+                end;
+              end;
+            end;
+            try
+              Self_.DownloadFile(RInfo.RelPath, Sftp);
+              Inc(Pulled);
+            except
+              on E: Exception do
+                Self_.Log('[PULL FAILED] ' + TPath.GetFileName(RInfo.RelPath) + '  (' + E.Message + ')');
+            end;
+          end;
+          Self_.Log('Pull All complete: ' + IntToStr(Pulled) + ' / ' + IntToStr(RemoteList.Count) +
+            ' file(s) downloaded. Reload any open files from disk.');
+        except
+          on E: Exception do
+            Self_.Log('Pull All error: ' + E.Message);
+        end;
+      finally
+        if BackupZip <> nil then
+        begin
+          BackupZip.Close;
+          BackupZip.Free;
+          if BackedUp > 0 then
+            Self_.Log('[BACKUP] ' + IntToStr(BackedUp) + ' file(s) saved to ' + TPath.GetFileName(BackupZipPath));
+        end;
+        try Sftp := nil; except end;
+        try
+          if Assigned(Session) then
+          begin
+            Session.Disconnect;
+            Session := nil;
+          end;
+        except
+        end;
+        Sleep(200);
+        RemoteList.Free;
+        TMainThreadRunner.Queue(
+          procedure
+          begin
+            Self_.FSyncBusy := False;
+            if Assigned(AOnDone) then AOnDone;
+          end);
+      end;
+    end));
 end;
 
 procedure TSftpSyncEngine.StartWatchThread;
@@ -657,6 +871,32 @@ begin
 end;
 
 { ---------------------------------------------------------------------------
+  Backup support
+  --------------------------------------------------------------------------- }
+
+function TSftpSyncEngine.NextBackupZipPath: string;
+var
+  BackupDir: string;
+  Files: TStringDynArray;
+  F, BaseName: string;
+  Num, MaxNum: Integer;
+begin
+  BackupDir := FLocalBasePath + PathDelim + '__backup';
+  if not TDirectory.Exists(BackupDir) then
+    TDirectory.CreateDirectory(BackupDir);
+  MaxNum := 0;
+  Files := TDirectory.GetFiles(BackupDir, 'backup_*.zip');
+  for F in Files do
+  begin
+    BaseName := TPath.GetFileNameWithoutExtension(F);
+    if TryStrToInt(Copy(BaseName, 8, MaxInt), Num) then  // skip 'backup_' (7 chars)
+      if Num > MaxNum then
+        MaxNum := Num;
+  end;
+  Result := BackupDir + PathDelim + Format('backup_%.3d.zip', [MaxNum + 1]);
+end;
+
+{ ---------------------------------------------------------------------------
   Compare lists and sync
   --------------------------------------------------------------------------- }
 
@@ -677,6 +917,9 @@ var
   // Comparing remote-to-remote (UTC-to-UTC) avoids all timezone issues.
   LastRemote: TDateTime;
   LastLocal: TDateTime;
+  BackupZip: TZipFile;
+  BackupZipPath: string;
+  BackedUp: Integer;
 
   function FmtDT(const ADateTime: TDateTime): string;
   begin
@@ -686,9 +929,34 @@ var
       Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', ADateTime);
   end;
 
+  procedure AddToBackup(const ARelPath: string);
+  var
+    LocalPath: string;
+  begin
+    if not FBackupEnabled then Exit;
+    LocalPath := FLocalBasePath + PathDelim + StringReplace(ARelPath, '/', PathDelim, [rfReplaceAll]);
+    if not TFile.Exists(LocalPath) then Exit;
+    if BackupZip = nil then
+    begin
+      BackupZipPath := NextBackupZipPath;
+      BackupZip := TZipFile.Create;
+      BackupZip.Open(BackupZipPath, zmWrite);
+    end;
+    try
+      BackupZip.Add(LocalPath, ARelPath);
+      Inc(BackedUp);
+    except
+      on E: Exception do
+        Log('[BACKUP FAILED] ' + TPath.GetFileName(ARelPath) + '  (' + E.Message + ')');
+    end;
+  end;
+
 begin
   Uploaded := 0;
   Downloaded := 0;
+  BackupZip := nil;
+  BackupZipPath := '';
+  BackedUp := 0;
 
   LocalMap := TDictionary<string, TSyncFileInfo>.Create;
   RemoteMap := TDictionary<string, TSyncFileInfo>.Create;
@@ -779,6 +1047,7 @@ begin
 
         if RemoteChanged and not LocalChanged then
         begin
+          AddToBackup(RInfo.RelPath);
           try
             DownloadFile(RInfo.RelPath, Sftp);
             Log('[DOWN] ' + TPath.GetFileName(RInfo.RelPath) + '  Reason: remote changed' + '  Remote: ' + FmtDT(TTimeZone.Local.ToLocalTime(RInfo.MTime)) +
@@ -827,6 +1096,7 @@ begin
       end
       else if Diff < -TOLERANCE then
       begin
+        AddToBackup(RInfo.RelPath);
         try
           DownloadFile(RInfo.RelPath, Sftp);
           Log('[DOWN] ' + TPath.GetFileName(RInfo.RelPath) + '  Reason: remote newer' + '  Remote: ' + FmtDT(TTimeZone.Local.ToLocalTime(RInfo.MTime)) +
@@ -858,6 +1128,13 @@ begin
       Log('Sync cycle: ' + IntToStr(Uploaded) + ' uploaded, ' + IntToStr(Downloaded) + ' downloaded.');
 
   finally
+    if BackupZip <> nil then
+    begin
+      BackupZip.Close;
+      BackupZip.Free;
+      if BackedUp > 0 then
+        Log('[BACKUP] ' + IntToStr(BackedUp) + ' file(s) saved to ' + TPath.GetFileName(BackupZipPath));
+    end;
     LocalMap.Free;
     RemoteMap.Free;
   end;
