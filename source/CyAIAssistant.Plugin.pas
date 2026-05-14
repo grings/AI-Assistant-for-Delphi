@@ -19,7 +19,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.SyncObjs, System.UITypes,
   Winapi.Windows, Winapi.Messages,
-  Vcl.Menus, Vcl.ActnList, Vcl.ExtCtrls, Vcl.AppEvnts,
+  Vcl.Menus, Vcl.ActnList, Vcl.Controls, Vcl.ExtCtrls, Vcl.AppEvnts,
   ToolsAPI, CyAIAssistant.AIClient, CyAIAssistant.GPUMonitor;
 
 type
@@ -70,6 +70,8 @@ type
     FTimer: TTimer;
     FCPUThread: TCPUMonitorThread;
     FCompletionClient: TAIClient;
+    FTranslateClient: TAIClient;
+    FTranslationEditor: IOTASourceEditor; // editor active when Translate was invoked
     FAppEvents: TApplicationEvents;
     FCompletionRunning: Boolean;
     FInstalled: Boolean;
@@ -87,6 +89,9 @@ type
     procedure OnAboutClick(Sender: TObject);
     procedure OnChatClick(Sender: TObject);
     procedure OnCodeCompletionClick(Sender: TObject);
+    procedure OnTranslateClick(Sender: TObject);
+    procedure OnCopyTranslationClick(Sender: TObject);
+    procedure OnReplaceTranslationClick(Sender: TObject);
     procedure OnAppMessage(var Msg: tagMSG; var Handled: Boolean);
     function HasOpenProject: Boolean;
     function FindEditorPopup: TPopupMenu;
@@ -102,7 +107,7 @@ type
 implementation
 
 uses
-  Vcl.Dialogs, Vcl.Forms,
+  Vcl.Dialogs, Vcl.Forms, Vcl.StdCtrls, Vcl.Clipbrd,
   System.IOUtils, System.StrUtils,
   CyAIAssistant.PromptDialog,
   CyAIAssistant.NewUnitDialog,
@@ -116,6 +121,26 @@ var
   ChatDlg: TChatDialog;
   PromptDlg: TPromptDialog;
   NewUnitDlg: TNewUnitDialog;
+
+// Language entries for the Translate submenu.
+// Caption = display text; Hint (Language field) = language name passed to AI.
+const
+  TRANSLATE_LANGS: array[0..13] of record Caption, Language: string end = (
+    (Caption: 'German (Deutsch)';       Language: 'German'),
+    (Caption: 'English';                Language: 'English'),
+    (Caption: 'French (Français)';      Language: 'French'),
+    (Caption: 'Spanish (Español)';      Language: 'Spanish'),
+    (Caption: 'Italian (Italiano)';     Language: 'Italian'),
+    (Caption: 'Danish (Dansk)';         Language: 'Danish'),
+    (Caption: 'Dutch (Nederlands)';     Language: 'Dutch'),
+    (Caption: 'Portuguese (Português)'; Language: 'Portuguese'),
+    (Caption: 'Russian (Русский)';      Language: 'Russian'),
+    (Caption: 'Polish (Polski)';        Language: 'Polish'),
+    (Caption: 'Swedish (Svenska)';      Language: 'Swedish'),
+    (Caption: 'Turkish (Türkçe)';       Language: 'Turkish'),
+    (Caption: 'Chinese (中文)';          Language: 'Chinese (Simplified)'),
+    (Caption: 'Japanese (日本語)';        Language: 'Japanese')
+  );
 
 // ---------------------------------------------------------------------------
 // Strips explanatory text that some models (e.g. deepseek-coder) add around
@@ -328,6 +353,7 @@ begin
   inherited;
   FInstalled := False;
   FCompletionClient := TAIClient.Create;
+  FTranslateClient := TAIClient.Create;
   FAppEvents := TApplicationEvents.Create(nil);
   FAppEvents.OnMessage := OnAppMessage;
   FCPUThread := TCPUMonitorThread.Create;
@@ -343,6 +369,7 @@ begin
   // Disable timer immediately to prevent any pending callbacks firing
   // after we start tearing down.  Free it before touching anything else.
   FreeAndNil(FCompletionClient);
+  FreeAndNil(FTranslateClient);
   FreeAndNil(FAppEvents);
 
   if Assigned(FCPUThread) then
@@ -467,6 +494,30 @@ begin
   end;
 end;
 
+// Builds the "Translate..." submenu and appends it to AParent.
+// ATag is set on popup items so they can be removed on the next popup refresh.
+procedure BuildTranslateSubMenu(AParent: TMenuItem; ATag: Integer; AHandler: TNotifyEvent; AHasSelection: Boolean);
+var
+  TransMenu: TMenuItem;
+  LangItem: TMenuItem;
+  I: Integer;
+begin
+  TransMenu := TMenuItem.Create(nil);
+  TransMenu.Tag := ATag;
+  TransMenu.Caption := 'Translate...';
+  TransMenu.Enabled := AHasSelection;
+  AParent.Add(TransMenu);
+  for I := Low(TRANSLATE_LANGS) to High(TRANSLATE_LANGS) do
+  begin
+    LangItem := TMenuItem.Create(nil);
+    LangItem.Tag := ATag;
+    LangItem.Caption := TRANSLATE_LANGS[I].Caption;
+    LangItem.Hint := TRANSLATE_LANGS[I].Language;
+    LangItem.OnClick := AHandler;
+    TransMenu.Add(LangItem);
+  end;
+end;
+
 // --- Tools menu (Settings + shortcut-bearing duplicate) ---
 
 procedure TCyAIAssistantPlugin.InstallToolsMenu;
@@ -549,6 +600,9 @@ begin
   SubItem.Caption := 'AI Chat...';
   SubItem.OnClick := OnChatClick;
   FMenuItemNewUnit.Insert(FMenuItemNewUnit.Count, SubItem);
+
+  // "Translate..." submenu in Tools menu (always uses Ollama translation model)
+  BuildTranslateSubMenu(FMenuItemNewUnit, 0, OnTranslateClick, True);
 
   FMenuItemSftpSync := TMenuItem.Create(FMenuItemNewUnit);
   FMenuItemSftpSync.Caption := 'SFTP Sync...';
@@ -691,6 +745,9 @@ begin
     Item.OnClick := OnCodeCompletionClick;
     SubMenu.Add(Item);
   end;
+
+  // "Translate..." submenu — enabled when text is selected
+  BuildTranslateSubMenu(SubMenu, TAG_AI, OnTranslateClick, Length(Trim(GetSelectedText)) > 0);
 end;
 
 // --- Editor / selection helpers ---
@@ -859,6 +916,179 @@ begin
       OnCodeCompletionClick(nil);
     end;
   end;
+end;
+
+procedure TCyAIAssistantPlugin.OnTranslateClick(Sender: TObject);
+var
+  Item: TMenuItem;
+  TargetLanguage, SelectedText: string;
+  ResultDlg: TForm;
+  MemoResult: TMemo;
+  BtnCopy, BtnReplace, BtnClose: TButton;
+  LblInfo: TLabel;
+  PanelBottom: TPanel;
+  DlgOpen: Boolean;
+begin
+  Item := Sender as TMenuItem;
+  TargetLanguage := Item.Hint;
+  if TargetLanguage = '' then
+    Exit;
+
+  SelectedText := GetSelectedText;
+  if Length(Trim(SelectedText)) = 0 then
+  begin
+    ShowMessage('No text selected.' + sLineBreak +
+      'Please select some text (comment or quoted string) in the editor first.');
+    Exit;
+  end;
+
+  if Trim(GSettings.OllamaTranslationModel) = '' then
+  begin
+    ShowMessage('No translation model configured.' + sLineBreak +
+      'Please set one in Settings > Ollama (Local) > Translation Model.');
+    Exit;
+  end;
+
+  DlgOpen := True;
+  FTranslationEditor := GetCurrentEditor; // saved so Replace can access it
+
+  ResultDlg := TForm.Create(nil);
+  try
+    ResultDlg.Caption := 'Translation to ' + TargetLanguage;
+    ResultDlg.Width := 580;
+    ResultDlg.Height := 340;
+    ResultDlg.Position := poScreenCenter;
+    ResultDlg.BorderStyle := bsDialog;
+
+    LblInfo := TLabel.Create(ResultDlg);
+    LblInfo.Parent := ResultDlg;
+    LblInfo.Left := 8;
+    LblInfo.Top := 8;
+    LblInfo.Caption :=
+      'Translating to ' + TargetLanguage + ' using ' + GSettings.OllamaTranslationModel + '...';
+    LblInfo.AutoSize := True;
+
+    MemoResult := TMemo.Create(ResultDlg);
+    MemoResult.Parent := ResultDlg;
+    MemoResult.Left := 8;
+    MemoResult.Top := 30;
+    MemoResult.Width := ResultDlg.ClientWidth - 16;
+    MemoResult.Height := ResultDlg.ClientHeight - 88;
+    MemoResult.ReadOnly := True;
+    MemoResult.Anchors := [akLeft, akTop, akRight, akBottom];
+    MemoResult.ScrollBars := ssVertical;
+    MemoResult.Font.Name := 'Segoe UI';
+    MemoResult.Font.Size := 10;
+
+    PanelBottom := TPanel.Create(ResultDlg);
+    PanelBottom.Parent := ResultDlg;
+    PanelBottom.Align := alBottom;
+    PanelBottom.Height := 46;
+    PanelBottom.BevelOuter := bvNone;
+
+    BtnCopy := TButton.Create(ResultDlg);
+    BtnCopy.Parent := PanelBottom;
+    BtnCopy.Caption := 'Copy to Clipboard';
+    BtnCopy.Left := 8;
+    BtnCopy.Top := 9;
+    BtnCopy.Width := 130;
+    BtnCopy.Height := 28;
+    BtnCopy.Enabled := False;
+    BtnCopy.Tag := NativeInt(MemoResult);
+    BtnCopy.OnClick := OnCopyTranslationClick;
+
+    BtnReplace := TButton.Create(ResultDlg);
+    BtnReplace.Parent := PanelBottom;
+    BtnReplace.Caption := 'Replace Selection';
+    BtnReplace.Left := 146;
+    BtnReplace.Top := 9;
+    BtnReplace.Width := 130;
+    BtnReplace.Height := 28;
+    BtnReplace.Enabled := False;
+    BtnReplace.Tag := NativeInt(MemoResult);
+    BtnReplace.OnClick := OnReplaceTranslationClick;
+
+    BtnClose := TButton.Create(ResultDlg);
+    BtnClose.Parent := PanelBottom;
+    BtnClose.Caption := 'Close';
+    BtnClose.Left := PanelBottom.Width - 98;
+    BtnClose.Top := 9;
+    BtnClose.Width := 90;
+    BtnClose.Height := 28;
+    BtnClose.Anchors := [akTop, akRight];
+    BtnClose.ModalResult := mrCancel;
+
+    // Fire translation — callback runs on main thread via TThread.Synchronize.
+    // DlgOpen guards against the callback firing after the dialog is freed.
+    FTranslateClient.SendTranslationAsync(SelectedText, TargetLanguage,
+      procedure(const AResult, AError: string)
+      begin
+        if not DlgOpen then
+          Exit;
+        if AError <> '' then
+        begin
+          LblInfo.Caption := 'Translation failed.';
+          MemoResult.Text := AError;
+        end
+        else
+        begin
+          LblInfo.Caption := 'Translation to ' + TargetLanguage + ':';
+          MemoResult.Text := AResult;
+          BtnCopy.Enabled := True;
+          BtnReplace.Enabled := True;
+        end;
+      end);
+
+    ResultDlg.ShowModal;
+    DlgOpen := False;
+    FTranslateClient.Cancel; // abort if translation still running
+  finally
+    FTranslationEditor := nil;
+    ResultDlg.Free;
+  end;
+end;
+
+procedure TCyAIAssistantPlugin.OnCopyTranslationClick(Sender: TObject);
+var
+  Memo: TMemo;
+  Form: TCustomForm;
+begin
+  Memo := TMemo(TButton(Sender).Tag);
+  if Assigned(Memo) then
+    Clipboard.AsText := Memo.Text;
+  Form := GetParentForm(TButton(Sender));
+  if Assigned(Form) then
+    Form.ModalResult := mrOK;
+end;
+
+procedure TCyAIAssistantPlugin.OnReplaceTranslationClick(Sender: TObject);
+var
+  Memo: TMemo;
+  EditView: IOTAEditView;
+  Block: IOTAEditBlock;
+  Form: TCustomForm;
+begin
+  Memo := TMemo(TButton(Sender).Tag);
+  if not Assigned(Memo) then
+    Exit;
+  if not Assigned(FTranslationEditor) then
+  begin
+    ShowMessage('Editor reference lost. Use Copy to Clipboard instead.');
+    Exit;
+  end;
+  if FTranslationEditor.EditViewCount = 0 then
+    Exit;
+  EditView := FTranslationEditor.EditViews[0];
+  if EditView = nil then
+    Exit;
+  Block := EditView.Block;
+  if (Block <> nil) and Block.IsValid then
+    Block.Delete;
+  EditView.Position.InsertText(Memo.Text);
+  EditView.Paint;
+  Form := GetParentForm(TButton(Sender));
+  if Assigned(Form) then
+    Form.ModalResult := mrOK;
 end;
 
 procedure TCyAIAssistantPlugin.OnCodeCompletionClick(Sender: TObject);

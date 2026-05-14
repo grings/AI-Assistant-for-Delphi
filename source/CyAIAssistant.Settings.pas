@@ -64,6 +64,7 @@ type
     FTemperature: Double;
     FLastPromptIndex: Integer;
     FOllamaCompletionModel: string;
+    FOllamaTranslationModel: string;
     FCodeCompletionEnabled: Boolean;
     FPrompts: TList<TPromptTemplate>;
     FZaiAPIKey: string;
@@ -111,6 +112,7 @@ type
     property Temperature: Double read FTemperature write FTemperature;
     property LastPromptIndex: Integer read FLastPromptIndex write FLastPromptIndex;
     property OllamaCompletionModel: string read FOllamaCompletionModel write FOllamaCompletionModel;
+    property OllamaTranslationModel: string read FOllamaTranslationModel write FOllamaTranslationModel;
     property CodeCompletionEnabled: Boolean read FCodeCompletionEnabled write FCodeCompletionEnabled;
     property DebugEnabled: Boolean read FDebugEnabled write FDebugEnabled;
     property DebugLogFolder: string read FDebugLogFolder write FDebugLogFolder;
@@ -203,6 +205,7 @@ begin
   FTemperature := 0.2;
   FLastPromptIndex := 0;
   FOllamaCompletionModel := 'codellama';
+  FOllamaTranslationModel := 'translategemma';
   FCodeCompletionEnabled := False;
   FDebugEnabled := False;
   FDebugLogFolder := TPath.Combine(TPath.GetHomePath, 'CyAIAssistant\Logs');
@@ -409,6 +412,8 @@ begin
           FLastPromptIndex := Reg.ReadInteger('LastPromptIndex');
         if Reg.ValueExists('OllamaCompletionModel') then
           FOllamaCompletionModel := Reg.ReadString('OllamaCompletionModel');
+        if Reg.ValueExists('OllamaTranslationModel') then
+          FOllamaTranslationModel := Reg.ReadString('OllamaTranslationModel');
         if Reg.ValueExists('CodeCompletionEnabled') then
           FCodeCompletionEnabled := Reg.ReadBool('CodeCompletionEnabled');
         if Reg.ValueExists('DebugEnabled') then
@@ -461,6 +466,7 @@ begin
         Reg.WriteFloat('Temperature', FTemperature);
         Reg.WriteInteger('LastPromptIndex', FLastPromptIndex);
         Reg.WriteString('OllamaCompletionModel', FOllamaCompletionModel);
+        Reg.WriteString('OllamaTranslationModel', FOllamaTranslationModel);
         Reg.WriteBool('CodeCompletionEnabled', FCodeCompletionEnabled);
         Reg.WriteBool('DebugEnabled', FDebugEnabled);
         Reg.WriteString('DebugLogFolder', FDebugLogFolder);

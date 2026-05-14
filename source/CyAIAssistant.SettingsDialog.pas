@@ -48,6 +48,9 @@ type
     ComboOllamaCompletionModel: TComboBox;
     LblCompletionRating: TPanel;
     ChkCodeCompletion: TCheckBox;
+    LblOllamaTranslationModel: TLabel;
+    ComboOllamaTranslationModel: TComboBox;
+    LblTranslationRating: TPanel;
     TabGroq: TTabSheet;
     LblGroqKey: TLabel;
     LblGroqModel: TLabel;
@@ -129,6 +132,7 @@ type
     procedure BtnLoadModelsClick(Sender: TObject);
     procedure ComboOllamaModelChange(Sender: TObject);
     procedure ComboOllamaCompletionModelChange(Sender: TObject);
+    procedure ComboOllamaTranslationModelChange(Sender: TObject);
     procedure BtnBrowseLogFolderClick(Sender: TObject);
   private
     procedure LoadSettings;
@@ -137,6 +141,7 @@ type
     procedure LoadOllamaModels(ASilent: Boolean);
     procedure UpdateOllamaModelRating(const AModel: string);
     procedure UpdateCompletionRating(const AModel: string);
+    procedure UpdateTranslationRating(const AModel: string);
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -158,6 +163,7 @@ begin
   // Re-apply ratings after theming, as ApplyIDETheme may reset font colors.
   UpdateOllamaModelRating(ComboOllamaModel.Text);
   UpdateCompletionRating(ComboOllamaCompletionModel.Text);
+  UpdateTranslationRating(ComboOllamaTranslationModel.Text);
 end;
 
 procedure TSettingsDialog.LoadSettings;
@@ -176,6 +182,8 @@ begin
   UpdateOllamaModelRating(GSettings.OllamaModel);
   ComboOllamaCompletionModel.Text := GSettings.OllamaCompletionModel;
   UpdateCompletionRating(GSettings.OllamaCompletionModel);
+  ComboOllamaTranslationModel.Text := GSettings.OllamaTranslationModel;
+  UpdateTranslationRating(GSettings.OllamaTranslationModel);
   ChkCodeCompletion.Checked := GSettings.CodeCompletionEnabled;
   EditGroqKey.Text := GSettings.GroqAPIKey;
   EditGroqModel.Text := GSettings.GroqModel;
@@ -211,6 +219,7 @@ begin
   GSettings.OllamaEndpoint := Trim(EditOllamaEndpoint.Text);
   GSettings.OllamaModel := Trim(ComboOllamaModel.Text);
   GSettings.OllamaCompletionModel := Trim(ComboOllamaCompletionModel.Text);
+  GSettings.OllamaTranslationModel := Trim(ComboOllamaTranslationModel.Text);
   GSettings.CodeCompletionEnabled := ChkCodeCompletion.Checked;
   GSettings.GroqAPIKey := Trim(EditGroqKey.Text);
   GSettings.GroqModel := Trim(EditGroqModel.Text);
@@ -381,6 +390,7 @@ begin
   BaseURL := GetOllamaBaseURL(BaseURL);
   PrevModel := Trim(ComboOllamaModel.Text);
   PrevCompletionModel := Trim(ComboOllamaCompletionModel.Text);
+  var PrevTranslationModel: string := Trim(ComboOllamaTranslationModel.Text);
   HTTP := THTTPClient.Create;
   try
     HTTP.ConnectionTimeout := 3000;
@@ -410,9 +420,11 @@ begin
         end;
         ComboOllamaModel.Items.BeginUpdate;
         ComboOllamaCompletionModel.Items.BeginUpdate;
+        ComboOllamaTranslationModel.Items.BeginUpdate;
         try
           ComboOllamaModel.Items.Clear;
           ComboOllamaCompletionModel.Items.Clear;
+          ComboOllamaTranslationModel.Items.Clear;
           for i := 0 to Models.Count - 1 do
           begin
             ModelObj := Models.Items[i] as TJSONObject;
@@ -423,12 +435,14 @@ begin
               begin
                 ComboOllamaModel.Items.Add(Name);
                 ComboOllamaCompletionModel.Items.Add(Name);
+                ComboOllamaTranslationModel.Items.Add(Name);
               end;
             end;
           end;
         finally
           ComboOllamaModel.Items.EndUpdate;
           ComboOllamaCompletionModel.Items.EndUpdate;
+          ComboOllamaTranslationModel.Items.EndUpdate;
         end;
         if ComboOllamaModel.Items.Count > 0 then
         begin
@@ -445,6 +459,14 @@ begin
             ComboOllamaCompletionModel.ItemIndex := i
           else
             ComboOllamaCompletionModel.ItemIndex := 0;
+        end;
+        if ComboOllamaTranslationModel.Items.Count > 0 then
+        begin
+          i := ComboOllamaTranslationModel.Items.IndexOf(PrevTranslationModel);
+          if i >= 0 then
+            ComboOllamaTranslationModel.ItemIndex := i
+          else
+            ComboOllamaTranslationModel.ItemIndex := 0;
         end;
         if not ASilent then
           ShowMessage(IntToStr(ComboOllamaModel.Items.Count) + ' model(s) loaded from Ollama.');
@@ -618,6 +640,50 @@ end;
 procedure TSettingsDialog.ComboOllamaCompletionModelChange(Sender: TObject);
 begin
   UpdateCompletionRating(ComboOllamaCompletionModel.Text);
+end;
+
+procedure TSettingsDialog.UpdateTranslationRating(const AModel: string);
+const
+  CLR_GOOD    = TColor($00008000);
+  CLR_CAUTION = TColor($000080C8);
+  CLR_UNKNOWN = TColor($00808080);
+var
+  N: string;
+begin
+  N := LowerCase(Trim(AModel));
+  if N = '' then
+  begin
+    LblTranslationRating.Caption := '';
+    Exit;
+  end;
+  // Translation-focused models
+  if (Pos('translategemma', N) > 0) or (Pos('aya', N) > 0) or
+     (Pos('nllb', N) > 0) or (Pos('opus-mt', N) > 0) or
+     (Pos('madlad', N) > 0) or (Pos('seamless', N) > 0) or
+     (Pos('mbart', N) > 0) or (Pos('m2m', N) > 0) then
+  begin
+    LblTranslationRating.Caption := 'Recommended';
+    LblTranslationRating.Font.Color := CLR_GOOD;
+    Exit;
+  end;
+  // General multilingual models that handle translation well
+  if (Pos('qwen', N) > 0) or (Pos('llama3', N) > 0) or
+     (Pos('mistral', N) > 0) or (Pos('gemma', N) > 0) or
+     (Pos('phi3', N) > 0) or (Pos('phi4', N) > 0) or
+     (Pos('phi-3', N) > 0) or (Pos('phi-4', N) > 0) or
+     (Pos('command-r', N) > 0) then
+  begin
+    LblTranslationRating.Caption := 'Suitable';
+    LblTranslationRating.Font.Color := CLR_CAUTION;
+    Exit;
+  end;
+  LblTranslationRating.Caption := 'Unknown';
+  LblTranslationRating.Font.Color := CLR_UNKNOWN;
+end;
+
+procedure TSettingsDialog.ComboOllamaTranslationModelChange(Sender: TObject);
+begin
+  UpdateTranslationRating(ComboOllamaTranslationModel.Text);
 end;
 
 procedure TSettingsDialog.BtnTestOllamaClick(Sender: TObject);

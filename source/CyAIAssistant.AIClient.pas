@@ -57,6 +57,10 @@ type
     procedure SendOllamaChat(const AHistory: TArray<TChatMessage>; ACallback: TAIResultCallback);
     procedure SendOpenAICompatibleChat(const AHistory: TArray<TChatMessage>; const AEndpoint, AAPIKey, AModel: string; ACallback: TAIResultCallback);
 
+    // Ollama translation using OllamaTranslationModel
+    procedure SendOllamaTranslation(const AText, ATargetLanguage: string; ACallback: TAIResultCallback);
+    function BuildOllamaTranslationJSON(const AText, ATargetLanguage: string): string;
+
     // Ollama code completion via /api/generate
     procedure SendOllamaGenerate(const APrefix, ASuffix: string; ACallback: TAIResultCallback);
     function BuildOllamaGenerateJSON(const APrefix: string): string;
@@ -108,6 +112,9 @@ type
 
     // Ollama-only code completion using /api/generate with FIM (fill-in-middle)
     procedure SendCompletionAsync(const APrefix, ASuffix: string; ACallback: TAIResultCallback);
+
+    // Translation using Ollama with OllamaTranslationModel
+    procedure SendTranslationAsync(const AText, ATargetLanguage: string; ACallback: TAIResultCallback);
   end;
 
 implementation
@@ -304,6 +311,39 @@ begin
     Msg := TJSONObject.Create;
     Msg.AddPair('role', 'user');
     Msg.AddPair('content', APrompt);
+    Messages.Add(Msg);
+    Root.AddPair('messages', Messages);
+    Result := Root.ToJSON;
+  finally
+    Root.Free;
+  end;
+end;
+
+function TAIClient.BuildOllamaTranslationJSON(const AText, ATargetLanguage: string): string;
+var
+  Root, Msg, OllamaSystem, Options: TJSONObject;
+  Messages: TJSONArray;
+  Prompt: string;
+begin
+  Prompt := 'Translate the following text to ' + ATargetLanguage + '.' + #10 +
+    'Return ONLY the translated text, without any introduction, explanation, or additional text.' + #10#10 +
+    AText;
+  Root := TJSONObject.Create;
+  try
+    Root.AddPair('model', GSettings.OllamaTranslationModel);
+    Root.AddPair('stream', TJSONBool.Create(True));
+    Options := TJSONObject.Create;
+    Options.AddPair('temperature', TJSONNumber.Create(0.1));
+    Options.AddPair('num_predict', TJSONNumber.Create(2048));
+    Root.AddPair('options', Options);
+    Messages := TJSONArray.Create;
+    OllamaSystem := TJSONObject.Create;
+    OllamaSystem.AddPair('role', 'system');
+    OllamaSystem.AddPair('content', 'You are a professional translator. Translate text accurately and naturally. Return ONLY the translated text.');
+    Messages.Add(OllamaSystem);
+    Msg := TJSONObject.Create;
+    Msg.AddPair('role', 'user');
+    Msg.AddPair('content', Prompt);
     Messages.Add(Msg);
     Root.AddPair('messages', Messages);
     Result := Root.ToJSON;
@@ -892,6 +932,70 @@ begin
     procedure
     begin
       ACallback(ResultText, ErrorText);
+    end);
+end;
+
+procedure TAIClient.SendOllamaTranslation(const AText, ATargetLanguage: string; ACallback: TAIResultCallback);
+var
+  HTTP: THTTPClient;
+  RequestBody, ResponseStream: TStringStream;
+  Headers: TNetHeaders;
+  ResultText: string;
+  ErrorText: string;
+begin
+  if Trim(GSettings.OllamaTranslationModel) = '' then
+  begin
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        ACallback('', 'No translation model configured. Please set one in Settings > Ollama (Local).');
+      end);
+    Exit;
+  end;
+  HTTP := CreateHTTP(10000, 300000);
+  try
+    Headers := [TNameValuePair.Create('Content-Type', 'application/json')];
+    RequestBody := TStringStream.Create(BuildOllamaTranslationJSON(AText, ATargetLanguage), TEncoding.UTF8);
+    ResponseStream := TStringStream.Create('', TEncoding.UTF8);
+    try
+      try
+        if Assigned(FLogger) then
+          FLogger.LogRequest('POST', GSettings.OllamaEndpoint, Headers, RequestBody.DataString);
+        HTTP.Post(GSettings.OllamaEndpoint, RequestBody, ResponseStream, Headers);
+        ResultText := Trim(ReadOllamaStream(ResponseStream.DataString));
+        if Assigned(FLogger) then
+          FLogger.LogResponse(200, nil, ResponseStream.DataString);
+      except
+        on E: Exception do
+          if not FCancelled then
+          begin
+            ErrorText := 'Ollama translation error (is it running?): ' + E.Message;
+            if Assigned(FLogger) then
+              FLogger.LogResponse(0, nil, '', E.Message);
+          end;
+      end;
+    finally
+      RequestBody.Free;
+      ResponseStream.Free;
+    end;
+  finally
+    DestroyHTTP(HTTP);
+  end;
+  if FCancelled then
+    Exit;
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      ACallback(ResultText, ErrorText);
+    end);
+end;
+
+procedure TAIClient.SendTranslationAsync(const AText, ATargetLanguage: string; ACallback: TAIResultCallback);
+begin
+  TTask.Run(
+    procedure
+    begin
+      SendOllamaTranslation(AText, ATargetLanguage, ACallback);
     end);
 end;
 

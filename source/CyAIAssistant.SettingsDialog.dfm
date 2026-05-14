@@ -325,7 +325,7 @@ object SettingsDialog: TSettingsDialog
       end
       object LblOllamaInfo: TLabel
         Left = 16
-        Top = 204
+        Top = 232
         Width = 530
         Height = 60
         Margins.Left = 5
@@ -338,6 +338,17 @@ object SettingsDialog: TSettingsDialog
           'codellama:13b, deepseek-coder:6.7b'#13#10'Recommended for Completion: ' +
           'qwen2.5-coder:1.5b, qwen2.5-coder:7b, starcoder2:3b, codellama:7' +
           'b'
+      end
+      object LblOllamaTranslationModel: TLabel
+        Left = 16
+        Top = 198
+        Width = 98
+        Height = 15
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Caption = 'Translation Model:'
       end
       object LblOllamaModelRating: TPanel
         Left = 448
@@ -460,6 +471,47 @@ object SettingsDialog: TSettingsDialog
         Margins.Bottom = 5
         Caption = 'Enable Code Completion (Ctrl+Alt+Space)'
         TabOrder = 5
+      end
+      object ComboOllamaTranslationModel: TComboBox
+        Left = 200
+        Top = 195
+        Width = 240
+        Height = 23
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        TabOrder = 8
+        OnChange = ComboOllamaTranslationModelChange
+        Items.Strings = (
+          'translategemma'
+          'aya'
+          'aya-expanse'
+          'qwen2.5:7b'
+          'qwen2.5:14b'
+          'llama3.1:8b'
+          'mistral:7b'
+          'gemma2:9b'
+          'phi4:14b'
+          'command-r')
+      end
+      object LblTranslationRating: TPanel
+        Left = 448
+        Top = 195
+        Width = 120
+        Height = 23
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 9
+        StyleElements = [seClient, seBorder]
       end
     end
     object TabGroq: TTabSheet
@@ -1088,7 +1140,7 @@ object SettingsDialog: TSettingsDialog
         object LblPromptTemplates: TLabel
           Left = 0
           Top = 0
-          Width = 220
+          Width = 108
           Height = 15
           Margins.Left = 5
           Margins.Top = 5
@@ -1103,7 +1155,6 @@ object SettingsDialog: TSettingsDialog
           Font.Style = [fsBold]
           ParentFont = False
           Layout = tlCenter
-          ExplicitWidth = 108
         end
         object ListCustomPrompts: TListBox
           Left = 0
@@ -1118,7 +1169,6 @@ object SettingsDialog: TSettingsDialog
           ItemHeight = 15
           TabOrder = 0
           OnClick = ListCustomPromptsClick
-          ExplicitHeight = 281
         end
         object PanelListBtns: TPanel
           Left = 0
