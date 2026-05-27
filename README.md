@@ -66,6 +66,29 @@ Press **Ctrl+Alt+Space** (or use the right-click menu) to let a local Ollama mod
 
 ---
 
+### Translate — Translate Comments and Strings with a Local Model
+
+Select any text in the editor (a comment, a string literal, a doc block) and translate it to one of 14 languages — entirely on-device via Ollama, without sending anything to a cloud provider.
+
+- **14 languages** — German, English, French, Spanish, Italian, Danish, Dutch, Portuguese, Russian, Polish, Swedish, Turkish, Chinese (Simplified), Japanese
+- **Ollama-only** — uses a dedicated translation model separate from the code-assistant and completion models; nothing leaves the machine
+- **Two entry points** — right-click the editor selection, or use **Tools → Cypheros AI Assistant → Translate…**
+- **Result dialog** — shows the translation as soon as the model responds; supports **Copy to Clipboard** and **Replace Selection** (overwrites the original selected text in the editor)
+- **Cancel-safe** — uses its own `FTranslateClient` instance, so translation and code completion can be cancelled independently
+- The translation model is configured separately in **Settings → Ollama (Local) → Translation Model**; it can be any Ollama model but purpose-built multilingual models give the best results
+
+#### Recommended translation models (via `ollama pull`)
+
+| Model | Notes |
+|---|---|
+| `translategemma` | Default; compact and fast |
+| `aya` / `aya-expanse` | Strong multilingual coverage |
+| `qwen2.5:7b` / `qwen2.5:14b` | Excellent for Asian languages |
+| `mistral:7b` | Good general-purpose multilingual |
+| `llama3.1:8b` | Solid for European languages |
+
+---
+
 ### AI Chat — Multi-Turn Conversation
 
 A persistent chat window for open-ended work with the AI.
@@ -153,7 +176,7 @@ All AI provider configuration in one place:
 
 - API keys and endpoints for each provider
 - Model selection with editable model name per provider
-- Ollama model browser — load available local models and test connectivity
+- Ollama model browser — load available local models and test connectivity; three independent model slots: **Code Assistant**, **Code Completion**, and **Translation**
 - **Custom Prompt Manager** — create, edit, reorder and delete your own named prompts
 - Global defaults: max tokens, temperature
 
@@ -210,6 +233,7 @@ CyAIAssistant follows the active Delphi IDE theme automatically. Full support fo
 | Task | How |
 |---|---|
 | Refactor or transform selected code | Select code → **Tools → Cypheros AI Assistant → Code Assistant** |
+| Translate a comment or string | Select text → right-click → **Translate…** → pick language, or **Tools → Cypheros AI Assistant → Translate…** |
 | Open AI chat | **Tools → Cypheros AI Assistant → AI Chat** |
 | Generate a new unit or class | **Tools → Cypheros AI Assistant → Unit/Class Assistant** |
 | Configure SFTP sync | **Tools → Cypheros AI Assistant → SFTP Sync** (requires an open project) |
