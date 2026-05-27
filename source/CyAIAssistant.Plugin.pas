@@ -920,7 +920,6 @@ end;
 
 procedure TCyAIAssistantPlugin.OnTranslateClick(Sender: TObject);
 var
-  Item: TMenuItem;
   TargetLanguage, SelectedText: string;
   ResultDlg: TForm;
   MemoResult: TMemo;
@@ -928,9 +927,30 @@ var
   LblInfo: TLabel;
   PanelBottom: TPanel;
   DlgOpen: Boolean;
+  I: Integer;
 begin
-  Item := Sender as TMenuItem;
-  TargetLanguage := Item.Hint;
+  // Sender is TMenuItem when triggered from the editor right-click popup menu.
+  // When triggered from the IDE's action-based Tools menu (TActionMainMenuBar),
+  // the IDE wraps menu items in TCustomAction objects, so Sender is TCustomAction.
+  TargetLanguage := '';
+  if Sender is TMenuItem then
+    TargetLanguage := TMenuItem(Sender).Hint
+  else if Sender is TCustomAction then
+  begin
+    // The IDE copies Hint from TMenuItem to TCustomAction in most cases.
+    TargetLanguage := TCustomAction(Sender).Hint;
+    if TargetLanguage = '' then
+    begin
+      // Fall back: match Caption against the known language table.
+      for I := Low(TRANSLATE_LANGS) to High(TRANSLATE_LANGS) do
+        if SameText(TCustomAction(Sender).Caption, TRANSLATE_LANGS[I].Caption) then
+        begin
+          TargetLanguage := TRANSLATE_LANGS[I].Language;
+          Break;
+        end;
+    end;
+  end;
+
   if TargetLanguage = '' then
     Exit;
 
