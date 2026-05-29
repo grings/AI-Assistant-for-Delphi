@@ -98,6 +98,7 @@ type
     function GetSelectedText: string;
     function GetCurrentEditor: IOTASourceEditor;
     procedure OnMonitor(Sender: TObject);
+    procedure CloseSftpSyncDialog;
   public
     constructor Create;
     destructor Destroy; override;
@@ -114,6 +115,7 @@ uses
   CyAIAssistant.ChatDialog,
   CyAIAssistant.Settings,
   CyAIAssistant.SettingsDialog,
+  CyAIAssistant.SftpSync,
   CyAIAssistant.SftpSyncDialog,
   CyAIAssistant.AboutDialog;
 
@@ -453,6 +455,18 @@ begin
   FTimer.Enabled := True;
 end;
 
+procedure TCyAIAssistantPlugin.CloseSftpSyncDialog;
+var
+  I: Integer;
+begin
+  for I := 0 to Screen.FormCount - 1 do
+    if Screen.Forms[I] is TSftpSyncDialog then
+    begin
+      Screen.Forms[I].Close; // FormClose sets caFree — frees the instance
+      Break;
+    end;
+end;
+
 procedure TCyAIAssistantPlugin.OnUpdateMenuState(Sender: TObject);
 begin
   if Assigned(FMenuItemSftpSync) then
@@ -461,6 +475,19 @@ begin
     FMenuItemCodeAssist.Enabled := (GetCurrentEditor <> nil);
   if Assigned(FMenuItemCompletion) then
     FMenuItemCompletion.Enabled := (GetCurrentEditor <> nil) and GSettings.CodeCompletionEnabled;
+
+  // The SFTP Sync menu item is disabled when no project is open, so sync can
+  // only ever be started with an active project.  If that project is later
+  // closed the engine keeps running but can no longer resolve a valid config
+  // path, which causes a permissions error on the next Stop attempt.
+  // Detect the "project gone while sync running" case here: stop the engine
+  // and close the dialog so the user cannot restart without a project.
+  if Assigned(GSftpSync) and GSftpSync.IsRunning and not HasOpenProject then
+  begin
+    GSftpSync.SaveCacheTo(GSftpSync.ConfigFilePath);
+    GSftpSync.Stop;
+    CloseSftpSyncDialog;
+  end;
 end;
 
 function TCyAIAssistantPlugin.HasOpenProject: Boolean;

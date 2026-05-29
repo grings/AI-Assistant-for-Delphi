@@ -109,6 +109,12 @@ type
     procedure SaveSettings;
     function GetActiveProjectPath: string;
     function GetConfigFilePath: string;
+    // Returns the config file path to read/write settings.
+    // When a project is active this equals GetConfigFilePath.
+    // After the project is closed it falls back to the path stored in the
+    // engine (set at Start time), so Stop/SaveSettings still target the
+    // correct project folder rather than the IDE exe directory.
+    function GetEffectiveConfigPath: string;
     function ParseWatchedExts(const AText: string): TArray<string>;
     function GetPermissions: TFilePermissions;
     procedure SetPermissions(APerms: TFilePermissions);
@@ -450,12 +456,25 @@ begin
     Result := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), CONFIG_FILE);
 end;
 
+function TSftpSyncDialog.GetEffectiveConfigPath: string;
+begin
+  // Prefer the project-based path while a project is open.
+  if GetActiveProjectPath <> '' then
+    Result := GetConfigFilePath
+  else if (GSftpSync <> nil) and (GSftpSync.ConfigFilePath <> '') then
+    // Project has been closed: fall back to the path cached when sync started.
+    // This avoids writing to the (likely write-protected) IDE exe directory.
+    Result := GSftpSync.ConfigFilePath
+  else
+    Result := GetConfigFilePath;
+end;
+
 procedure TSftpSyncDialog.LoadSettings;
 var
   Ini: TIniFile;
   Path: string;
 begin
-  Path := GetConfigFilePath;
+  Path := GetEffectiveConfigPath;
   if not TFile.Exists(Path) then
     Exit;
   Ini := TIniFile.Create(Path);
@@ -486,7 +505,7 @@ var
   Ini: TIniFile;
   Path: string;
 begin
-  Path := GetConfigFilePath;
+  Path := GetEffectiveConfigPath;
   Ini := TIniFile.Create(Path);
   try
     Ini.WriteString(CONFIG_SECTION, 'Host', Trim(EditHost.Text));
@@ -525,7 +544,7 @@ var
 begin
   if GSftpSync.IsRunning then
   begin
-    GSftpSync.SaveCacheTo(GetConfigFilePath); // persist cache before stopping
+    GSftpSync.SaveCacheTo(GetEffectiveConfigPath);
     GSftpSync.Stop;
     SaveSettings;
     UpdateStatusUI;
@@ -533,6 +552,12 @@ begin
   end;
 
   // -- Validate ------------------------------------------------------------
+
+  if GetActiveProjectPath = '' then
+  begin
+    ShowMessage('No project is currently open.' + sLineBreak + 'Please open a project before starting SFTP sync.');
+    Exit;
+  end;
 
   if Trim(EditHost.Text) = '' then
   begin
@@ -632,6 +657,8 @@ begin
   GSftpSync.RemoteQuietPeriodSecs := StrToIntDef(EditQuietPeriod.Text, 60);
   GSftpSync.Start(Trim(EditHost.Text), Port, Trim(EditUser.Text), EditPass.Text, Trim(EditKeyPath.Text), Trim(EditPubKeyPath.Text), EditRemoteBase.Text,
     LocalBase, CheckIncludeSubDirs.Checked, Interval, GetPermissions, ParseWatchedExts(EditWatchedExts.Text));
+  // Cache the config path so it remains correct after the project is closed.
+  GSftpSync.ConfigFilePath := GetConfigFilePath;
 
   UpdateStatusUI;
   PageControl.ActivePage := TabLog;

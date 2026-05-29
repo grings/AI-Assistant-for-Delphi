@@ -99,6 +99,9 @@ type
     FStopEvent: THandle;
     FImmediateSync: THandle; // signalled by watcher -> trigger extra cycle
 
+    // -- Config path cached at Start time -----------------------------------
+    FConfigFilePath: string;
+
     // -- Log / notifications ------------------------------------------------
     FOnLog: TSftpLogEvent;
     FOnStop: TProc;
@@ -156,6 +159,9 @@ type
     property BackupEnabled: Boolean read FBackupEnabled write FBackupEnabled;
     property RemoteQuietPeriodSecs: Integer read FRemoteQuietPeriodSecs write FRemoteQuietPeriodSecs;
     property IsBusy: Boolean read FSyncBusy;
+    // Path to the config file used to start this sync session.
+    // Set by the dialog at Start time so it survives project close.
+    property ConfigFilePath: string read FConfigFilePath write FConfigFilePath;
   end;
 
 var
