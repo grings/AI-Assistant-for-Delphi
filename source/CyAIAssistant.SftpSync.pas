@@ -6,14 +6,16 @@
 //
 // Architecture
 // ------------
-// One background TTask runs on a timer (interval seconds).  Each cycle:
+// A persistent SSH/SFTP connection is kept alive between sync cycles.
+// Each cycle:
 //
 // 1.  Collect local file list
 // Walk FLocalBasePath recursively (if configured), collect all files
 // matching watched extensions with their path, size and last-write time.
 //
-// 2.  Connect to SFTP server
-// CreateSession / UserAuth / CreateSftpClient.
+// 2.  Ensure connected
+// Verify the persistent session is still alive (SessionState = Authorized).
+// Reconnect automatically if the server dropped the idle connection.
 //
 // 3.  Ensure remote base directory exists (ForceDirectories).
 //
@@ -25,8 +27,6 @@
 // other side (1-second tolerance to avoid oscillation).
 // For files present only locally: upload.
 // For files present only remotely: download.
-//
-// 6.  Disconnect.
 //
 // Local-change watcher (FindFirstChangeNotification) triggers an immediate
 // extra sync cycle whenever any file in the project folder changes, so edits
@@ -118,11 +118,18 @@ type
     FLastSeenRemoteMTime: TDictionary<string, TDateTime>; // remote mtime from previous cycle
     FRemoteQuietActive: Boolean; // True while waiting for quiet period to elapse
 
+    // -- Persistent SFTP connection ----------------------------------------
+    FSession: ISshSession;
+    FSftp: ISftpClient;
+    FConnected: Boolean;
+
     procedure Log(const AMsg: string);
     function NextBackupZipPath: string;
     procedure OnSyncTimer(Sender: TObject);
     procedure DoSyncCycle;
-    function ConnectSftp(out Session: ISshSession; out Sftp: ISftpClient; out AFatal: Boolean): Boolean;
+    function ConnectSftp(out AFatal: Boolean): Boolean;
+    procedure DisconnectSftp;
+    function EnsureConnected(out AFatal: Boolean): Boolean;
     procedure CollectLocalFiles(AList: TList<TSyncFileInfo>);
     procedure CollectRemoteFiles(Sftp: ISftpClient; const ARemoteDir: string; AList: TList<TSyncFileInfo>; ARecurse: Boolean);
     procedure SyncLists(Sftp: ISftpClient; Local, Remote: TList<TSyncFileInfo>);
@@ -391,6 +398,7 @@ var
 begin
   FSyncTimer.Enabled := False;
   StopWatchThread;
+  DisconnectSftp;
   Log('Sync stopped.');
   if Assigned(FOnStop) then
   begin
@@ -424,14 +432,11 @@ begin
   TTask.Run(TProc(
     procedure
     var
-      Session: ISshSession;
-      Sftp: ISftpClient;
       LocalList: TList<TSyncFileInfo>;
       LInfo: TSyncFileInfo;
       Pushed: Integer;
+      Fatal: Boolean;
     begin
-      Session := nil;
-      Sftp := nil;
       LocalList := TList<TSyncFileInfo>.Create;
       try
         try
@@ -441,18 +446,21 @@ begin
             Self_.Log('Push All: no local files found in: ' + Self_.FLocalBasePath);
             Exit;
           end;
-          var Dummy: Boolean;
-          if not Self_.ConnectSftp(Session, Sftp, Dummy) then
+          if not Self_.EnsureConnected(Fatal) then
+          begin
+            if Fatal then
+              Self_.Log('Push All stopped — fix the settings and start again.');
             Exit;
+          end;
           if Self_.FRemoteBasePath = '' then
           begin
             Self_.Log('Push All aborted: remote base path is not configured.');
             Exit;
           end;
           try
-            if not Sftp.DirectoryExists(Self_.FRemoteBasePath) then
+            if not Self_.FSftp.DirectoryExists(Self_.FRemoteBasePath) then
             begin
-              Self_.EnsureRemoteDir(Self_.FRemoteBasePath, Sftp);
+              Self_.EnsureRemoteDir(Self_.FRemoteBasePath, Self_.FSftp);
               Self_.Log('Created remote directory: ' + Self_.FRemoteBasePath);
             end;
           except
@@ -466,7 +474,7 @@ begin
           for LInfo in LocalList do
           begin
             try
-              Self_.UploadFile(LInfo.RelPath, Sftp);
+              Self_.UploadFile(LInfo.RelPath, Self_.FSftp);
               Inc(Pushed);
             except
               on E: Exception do
@@ -475,23 +483,15 @@ begin
           end;
           Self_.Log('Push All complete: ' + IntToStr(Pushed) + ' / ' + IntToStr(LocalList.Count) + ' file(s) uploaded.');
         except
+          on E: ESshError do
+          begin
+            Self_.Log('Push All: connection lost: ' + E.Message);
+            Self_.DisconnectSftp;
+          end;
           on E: Exception do
             Self_.Log('Push All error: ' + E.Message);
         end;
       finally
-        try
-          Sftp := nil;
-        except
-        end;
-        try
-          if Assigned(Session) then
-          begin
-            Session.Disconnect;
-            Session := nil;
-          end;
-        except
-        end;
-        Sleep(200);
         LocalList.Free;
         TMainThreadRunner.Queue(
           procedure
@@ -524,8 +524,6 @@ begin
   TTask.Run(TProc(
     procedure
     var
-      Session: ISshSession;
-      Sftp: ISftpClient;
       RemoteList: TList<TSyncFileInfo>;
       RInfo: TSyncFileInfo;
       Pulled: Integer;
@@ -533,19 +531,21 @@ begin
       BackupZipPath: string;
       BackedUp: Integer;
       LocalPath: string;
+      Fatal: Boolean;
     begin
-      Session := nil;
-      Sftp := nil;
       RemoteList := TList<TSyncFileInfo>.Create;
       BackupZip := nil;
       BackupZipPath := '';
       BackedUp := 0;
       try
         try
-          var Dummy: Boolean;
-          if not Self_.ConnectSftp(Session, Sftp, Dummy) then
+          if not Self_.EnsureConnected(Fatal) then
+          begin
+            if Fatal then
+              Self_.Log('Pull All stopped — fix the settings and start again.');
             Exit;
-          Self_.CollectRemoteFiles(Sftp, Self_.FRemoteBasePath, RemoteList, Self_.FIncludeSubDirs);
+          end;
+          Self_.CollectRemoteFiles(Self_.FSftp, Self_.FRemoteBasePath, RemoteList, Self_.FIncludeSubDirs);
           if RemoteList.Count = 0 then
           begin
             Self_.Log('Pull All: no remote files found in: ' + Self_.FRemoteBasePath);
@@ -576,7 +576,7 @@ begin
               end;
             end;
             try
-              Self_.DownloadFile(RInfo.RelPath, Sftp);
+              Self_.DownloadFile(RInfo.RelPath, Self_.FSftp);
               Inc(Pulled);
             except
               on E: Exception do
@@ -585,6 +585,11 @@ begin
           end;
           Self_.Log('Pull All complete: ' + IntToStr(Pulled) + ' / ' + IntToStr(RemoteList.Count) + ' file(s) downloaded. Reload any open files from disk.');
         except
+          on E: ESshError do
+          begin
+            Self_.Log('Pull All: connection lost: ' + E.Message);
+            Self_.DisconnectSftp;
+          end;
           on E: Exception do
             Self_.Log('Pull All error: ' + E.Message);
         end;
@@ -596,19 +601,6 @@ begin
           if BackedUp > 0 then
             Self_.Log('[BACKUP] ' + IntToStr(BackedUp) + ' file(s) saved to ' + TPath.GetFileName(BackupZipPath));
         end;
-        try
-          Sftp := nil;
-        except
-        end;
-        try
-          if Assigned(Session) then
-          begin
-            Session.Disconnect;
-            Session := nil;
-          end;
-        except
-        end;
-        Sleep(200);
         RemoteList.Free;
         TMainThreadRunner.Queue(
           procedure
@@ -650,29 +642,30 @@ end;
 // SFTP connection helper
 // ---------------------------------------------------------------------------
 
-function TSftpSyncEngine.ConnectSftp(out Session: ISshSession; out Sftp: ISftpClient; out AFatal: Boolean): Boolean;
+function TSftpSyncEngine.ConnectSftp(out AFatal: Boolean): Boolean;
 var
   Attempts: Integer;
 begin
   Result := False;
   AFatal := False;
-  Session := nil;
-  Sftp := nil;
+  FConnected := False;
+  FSession := nil;
+  FSftp := nil;
   try
     // Network-level connection — failures here are transient (host unreachable,
     // SSH handshake noise, etc.).  Do NOT set AFatal.
     try
-      Session := CreateSession(FHost, FPort);
-      Session.ConfigKnownHostCheckPolicy(False, DefKnownHostCheckPolicy);
-      Session.Connect;
+      FSession := CreateSession(FHost, FPort);
+      FSession.ConfigKnownHostCheckPolicy(False, DefKnownHostCheckPolicy);
+      FSession.Connect;
     except
       on E: Exception do
         raise ESshError.CreateFmt('Cannot reach %s:%d — host unreachable or offline (%s)',
           [FHost, FPort, E.Message]);
     end;
-    Session.SetTimeout(60000);
+    FSession.SetTimeout(60000);
 
-    if Session.SessionState <> session_Connected then
+    if FSession.SessionState <> session_Connected then
       raise ESshError.CreateFmt('Cannot reach %s:%d — connection failed (no SSH response)',
         [FHost, FPort]);
 
@@ -680,16 +673,16 @@ begin
     AFatal := True;
     if FPrivateKeyPath <> '' then
     begin
-      if not Session.UserAuthKey(FUserName, FPublicKeyPath, FPrivateKeyPath) then
+      if not FSession.UserAuthKey(FUserName, FPublicKeyPath, FPrivateKeyPath) then
         raise ESshError.Create('Authentication failed: key rejected — check private/public key paths');
     end
     else
     begin
-      if not Session.UserAuthPass(FUserName, FPassword) then
+      if not FSession.UserAuthPass(FUserName, FPassword) then
         raise ESshError.Create('Authentication failed: wrong username or password');
     end;
 
-    if Session.SessionState <> session_Authorized then
+    if FSession.SessionState <> session_Authorized then
       raise ESshError.Create('Authentication failed: SSH not authorized');
 
     // SFTP subsystem — can be transiently unavailable under load.
@@ -697,34 +690,69 @@ begin
     Attempts := 0;
     repeat
       try
-        Sftp := CreateSftpClient(Session);
+        FSftp := CreateSftpClient(FSession);
       except
-        Sftp := nil;
+        FSftp := nil;
       end;
-      if Assigned(Sftp) then
+      if Assigned(FSftp) then
         Break;
       Inc(Attempts);
       if Attempts < 3 then
         Sleep(500);
     until Attempts >= 3;
 
-    if not Assigned(Sftp) then
+    if not Assigned(FSftp) then
       raise ESshError.Create('SFTP subsystem unavailable — check that the SSH server allows SFTP');
 
+    FConnected := True;
+    Log('Connected to ' + FHost + ':' + IntToStr(FPort));
     Result := True;
   except
     on E: Exception do
     begin
       Log('Connect failed: ' + E.Message);
       try
-        if Assigned(Session) then
-          Session.Disconnect;
+        if Assigned(FSession) then
+          FSession.Disconnect;
       except
       end;
-      Session := nil;
-      Sftp := nil;
+      FSession := nil;
+      FSftp := nil;
     end;
   end;
+end;
+
+procedure TSftpSyncEngine.DisconnectSftp;
+begin
+  FConnected := False;
+  try
+    FSftp := nil;
+  except
+  end;
+  try
+    if Assigned(FSession) then
+    begin
+      FSession.Disconnect;
+      FSession := nil;
+    end;
+  except
+  end;
+end;
+
+function TSftpSyncEngine.EnsureConnected(out AFatal: Boolean): Boolean;
+begin
+  AFatal := False;
+  // Verify the existing session is still alive before reusing it
+  if FConnected and Assigned(FSession) and (FSession.SessionState = session_Authorized) then
+  begin
+    Result := True;
+    Exit;
+  end;
+  // Session is gone or stale — clean up and reconnect
+  if FConnected then
+    Log('Connection lost — reconnecting.');
+  DisconnectSftp;
+  Result := ConnectSftp(AFatal);
 end;
 
 // ---------------------------------------------------------------------------
@@ -1332,15 +1360,11 @@ begin
   TTask.Run(TProc(
     procedure
     var
-      Session: ISshSession;
-      Sftp: ISftpClient;
       LocalList: TList<TSyncFileInfo>;
       RemoteList: TList<TSyncFileInfo>;
-      WasImmediate: Boolean;
       StopSync: Boolean;
+      Fatal: Boolean;
     begin
-      Session := nil;
-      Sftp := nil;
       StopSync := False;
       LocalList := TList<TSyncFileInfo>.Create;
       RemoteList := TList<TSyncFileInfo>.Create;
@@ -1355,9 +1379,8 @@ begin
             Exit;
           end;
 
-          // -- 2. Connect ---------------------------------------------------
-          var Fatal: Boolean;
-          if not Self_.ConnectSftp(Session, Sftp, Fatal) then
+          // -- 2. Ensure connected ------------------------------------------
+          if not Self_.EnsureConnected(Fatal) then
           begin
             if Fatal then
             begin
@@ -1375,9 +1398,9 @@ begin
             Exit;
           end;
           try
-            if not Sftp.DirectoryExists(RemoteBase) then
+            if not Self_.FSftp.DirectoryExists(RemoteBase) then
             begin
-              Self_.EnsureRemoteDir(RemoteBase, Sftp);
+              Self_.EnsureRemoteDir(RemoteBase, Self_.FSftp);
               Self_.Log('Created remote directory: ' + RemoteBase);
             end;
           except
@@ -1390,37 +1413,22 @@ begin
           end;
 
           // -- 4. Collect remote files ---------------------------------------
-          Self_.CollectRemoteFiles(Sftp, RemoteBase, RemoteList, IncludeSub);
+          Self_.CollectRemoteFiles(Self_.FSftp, RemoteBase, RemoteList, IncludeSub);
 
           // -- 5. Compare and sync -------------------------------------------
-          Self_.SyncLists(Sftp, LocalList, RemoteList);
+          Self_.SyncLists(Self_.FSftp, LocalList, RemoteList);
 
         except
+          on E: ESshError do
+          begin
+            Self_.Log('Connection lost: ' + E.Message + ' — will reconnect on next cycle.');
+            Self_.DisconnectSftp;
+          end;
           on E: Exception do
             Self_.Log('Sync error: ' + E.Message);
         end;
 
       finally
-        // -- 6. Disconnect ---------------------------------------------------
-        // Nil Sftp first (releases SFTP channel), then disconnect SSH session.
-        // Assign to local non-interface variable to break the closure's reference
-        // so libssh2 can fully tear down before the next cycle connects.
-        try
-          Sftp := nil;
-        except
-        end;
-        try
-          if Assigned(Session) then
-          begin
-            Session.Disconnect;
-            Session := nil;
-          end;
-        except
-        end;
-        // Give libssh2 a moment to complete TCP teardown before the closure
-        // frame (and any remaining interface refs) is garbage-collected.
-        Sleep(200);
-
         LocalList.Free;
         RemoteList.Free;
 
